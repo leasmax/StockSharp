@@ -48,7 +48,7 @@ namespace StockSharp.Quik.Xaml
 		/// DependencyProperty для <see cref="SelectedColumns"/>.
 		/// </summary>
 		public static readonly DependencyProperty SelectedColumnsProperty =
-			DependencyProperty.Register("SelectedColumns", typeof(List<string>), typeof(DdeColumnsPicker), new PropertyMetadata(new List<string>(), PropertyChangedCallback));
+			DependencyProperty.Register(nameof(SelectedColumns), typeof(List<string>), typeof(DdeColumnsPicker), new PropertyMetadata(new List<string>(), PropertyChangedCallback));
 
 		/// <summary>
 		/// Список выбранных столбцов.
@@ -62,7 +62,7 @@ namespace StockSharp.Quik.Xaml
 		/// <summary>
 		/// Столбцы, исключенные из списка выбора.
 		/// </summary>
-		public SynchronizedList<string> ExcludeColumns { get; private set; }
+		public SynchronizedList<string> ExcludeColumns { get; }
 
 		/// <summary>
 		/// Тип таблицы для редактирования списка столбцов.
@@ -138,7 +138,7 @@ namespace StockSharp.Quik.Xaml
 			SelectedColumns.AddRange(_columnsSelected.Select(i => i.First));
 
 			if (invoke)
-				SelectedColumnsCountChange.SafeInvoke();
+				SelectedColumnsCountChange?.Invoke();
 		}
 
 		private void btnAdd_Click(object sender, RoutedEventArgs e)

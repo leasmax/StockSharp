@@ -112,7 +112,6 @@ namespace StockSharp.Quik
 		public QuikTrans2QuikAdapter(IdGenerator transactionIdGenerator)
 			: base(transactionIdGenerator)
 		{
-			IsAsyncMode = true;
 			Platform = Platforms.x86;
 			//SessionHolder.TerminalChanged += ResetApi;
 			this.AddTransactionalSupport();
@@ -148,8 +147,6 @@ namespace StockSharp.Quik
 			}
 		}
 
-		private bool _isAsyncMode = true;
-
 		/// <summary>
 		/// Асинхронный режим. Если <see langword="true"/>, то все транзакции, такие как <see cref="OrderRegisterMessage"/>
 		/// или <see cref="OrderCancelMessage"/> будут отправляться в асинхронном режиме.
@@ -161,35 +158,28 @@ namespace StockSharp.Quik
 		[DisplayNameLoc(LocalizedStrings.Str1781Key)]
 		[DescriptionLoc(LocalizedStrings.Str1782Key)]
 		[PropertyOrder(2)]
-		public bool IsAsyncMode
-		{
-			get { return _isAsyncMode; }
-			set { _isAsyncMode = value; }
-		}
-
-		private bool _overrideDll = true;
+		public bool IsAsyncMode { get; set; } = true;
 
 		/// <summary>
 		/// Перезаписать файл библиотеки из ресурсов. По-умолчанию файл будет перезаписан.
 		/// </summary>
-		[CategoryLoc(LocalizedStrings.GeneralKey)]
+		[Category(_category)]
 		[DisplayNameLoc(LocalizedStrings.OverrideKey)]
 		[DescriptionLoc(LocalizedStrings.OverrideDllKey)]
 		[PropertyOrder(3)]
-		public bool OverrideDll
-		{
-			get { return _overrideDll; }
-			set { _overrideDll = value; }
-		}
+		public bool OverrideDll { get; set; } = true;
+
+		/// <summary>
+		/// https://forum.quik.ru/forum10/topic1218/
+		/// </summary>
+		[Category(_category)]
+		public bool SingleSlash { get; set; } = true;
 
 		/// <summary>
 		/// Проверить введенные параметры на валидность.
 		/// </summary>
 		[Browsable(false)]
-		public override bool IsValid
-		{
-			get { return !DllName.IsEmpty(); }
-		}
+		public override bool IsValid => !DllName.IsEmpty();
 
 		/// <summary>
 		/// Создать для заявки типа <see cref="OrderTypes.Conditional"/> условие, которое поддерживается подключением.
@@ -257,7 +247,7 @@ namespace StockSharp.Quik
 
 				case MessageTypes.OrderRegister:
 					var regMsg = (OrderRegisterMessage)message;
-					RegisterTransaction(regMsg.CreateRegisterTransaction(regMsg.GetValue<string>(PositionChangeTypes.DepoName), SecurityClassInfo));
+					RegisterTransaction(regMsg.CreateRegisterTransaction(regMsg.GetValue<string>(PositionChangeTypes.DepoName), SecurityClassInfo, SingleSlash));
 					break;
 
 				case MessageTypes.OrderReplace:
@@ -294,7 +284,7 @@ namespace StockSharp.Quik
 			if (transactionId <= 0 || transactionId > uint.MaxValue)
 				throw new InvalidOperationException(LocalizedStrings.Str1700Params.Put(transactionId));
 
-			FormatTransaction.SafeInvoke(transaction.SetTransactionId(transactionId));
+			FormatTransaction?.Invoke(transaction.SetTransactionId(transactionId));
 
 			_transactions.Add(transactionId, transaction);
 
@@ -306,7 +296,7 @@ namespace StockSharp.Quik
 
 				// http://stocksharp.com/forum/yaf_postst2247_Oshibka-pri-kotirovanii--sinkhronnyie-tranzaktsii.aspx
 
-				var execution = transaction.Message.ToExecutionMessage();
+				var execution = transaction.Message.CreateReply();
 
 				if (execution == null)
 					throw new ArgumentException(LocalizedStrings.Str1835, nameof(transaction));
@@ -343,7 +333,7 @@ namespace StockSharp.Quik
 					var apiEx = ex as ApiException;
 
 					if (isRegistering)
-						ProcessTransactionReply(execution, transaction, 0, apiMessage, apiEx != null ? apiEx.Code : Codes.Failed, ex);
+						ProcessTransactionReply(execution, transaction, 0, apiMessage, apiEx?.Code ?? Codes.Failed, ex);
 					else
 					{
 						execution.OrderState = OrderStates.Failed;
@@ -354,8 +344,7 @@ namespace StockSharp.Quik
 					error = ex;
 				}
 
-				if (error != null)
-					error.Throw();
+				error?.Throw();
 			}
 		}
 
@@ -483,7 +472,7 @@ namespace StockSharp.Quik
 				if (extendedCode != Codes.Success)
 					exception = new ApiException(extendedCode, message);
 
-				var orderMessage = builder.Message.ToExecutionMessage();
+				var orderMessage = builder.Message.CreateReply();
 
 				orderMessage.SystemComment = message;
 
@@ -591,22 +580,26 @@ namespace StockSharp.Quik
 			SendOutMessage(new ExecutionMessage
 			{
 				SecurityId = replaceMessage.SecurityId,
-				OriginalTransactionId = replaceMessage.OldTransactionId,
-				OrderId = replaceMessage.OldOrderId,
-				ExecutionType = ExecutionTypes.Order,
+				OriginalTransactionId = replaceMessage.TransactionId,
+				//OrderId = replaceMessage.OldOrderId,
+				ExecutionType = ExecutionTypes.Transaction,
 				OrderState = OrderStates.Failed,
-				IsCancelled = true,
-				Error = error
+				//IsCancelled = true,
+				Error = error,
+				HasOrderInfo = true,
+				ServerTime = CurrentTime,
 			});
 
-			SendOutMessage(new ExecutionMessage
-			{
-				SecurityId = replaceMessage.SecurityId,
-				OriginalTransactionId = replaceMessage.TransactionId,
-				ExecutionType = ExecutionTypes.Order,
-				OrderState = OrderStates.Failed,
-				Error = error
-			});
+			//SendOutMessage(new ExecutionMessage
+			//{
+			//	SecurityId = replaceMessage.SecurityId,
+			//	OriginalTransactionId = replaceMessage.TransactionId,
+			//	ExecutionType = ExecutionTypes.Transaction,
+			//	OrderState = OrderStates.Failed,
+			//	Error = error,
+			//	HasOrderInfo = true,
+			//	ServerTime = CurrentTime,
+			//});
 		}
 
 		/// <summary>
@@ -615,9 +608,9 @@ namespace StockSharp.Quik
 		/// <param name="storage">Хранилище настроек.</param>
 		public override void Save(SettingsStorage storage)
 		{
-			storage.SetValue("DllName", DllName);
-			storage.SetValue("IsAsyncMode", IsAsyncMode);
-			storage.SetValue("OverrideDll", OverrideDll);
+			storage.SetValue(nameof(DllName), DllName);
+			storage.SetValue(nameof(IsAsyncMode), IsAsyncMode);
+			storage.SetValue(nameof(OverrideDll), OverrideDll);
 
 			base.Save(storage);
 		}
@@ -628,9 +621,9 @@ namespace StockSharp.Quik
 		/// <param name="storage">Хранилище настроек.</param>
 		public override void Load(SettingsStorage storage)
 		{
-			DllName = storage.GetValue<string>("DllName");
-			IsAsyncMode = storage.GetValue<bool>("IsAsyncMode");
-			OverrideDll = storage.GetValue<bool>("OverrideDll");
+			DllName = storage.GetValue<string>(nameof(DllName));
+			IsAsyncMode = storage.GetValue<bool>(nameof(IsAsyncMode));
+			OverrideDll = storage.GetValue<bool>(nameof(OverrideDll));
 
 			base.Load(storage);
 		}

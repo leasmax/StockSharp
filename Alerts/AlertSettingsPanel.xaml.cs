@@ -24,8 +24,6 @@ namespace StockSharp.Alerts
 	using System.Windows;
 	using System.Windows.Controls;
 
-	using ActiproSoftware.Windows;
-
 	using Ecng.Collections;
 	using Ecng.Common;
 	using Ecng.ComponentModel;
@@ -63,7 +61,7 @@ namespace StockSharp.Alerts
 		/// <see cref="DependencyProperty"/> for <see cref="AlertSettingsPanel.MessageType"/>.
 		/// </summary>
 		public static readonly DependencyProperty MessageTypeProperty =
-			DependencyProperty.Register("MessageType", typeof(Type), typeof(AlertSettingsPanel), new PropertyMetadata(null, MessageTypeChanged));
+			DependencyProperty.Register(nameof(MessageType), typeof(Type), typeof(AlertSettingsPanel), new PropertyMetadata(null, MessageTypeChanged));
 
 		private static void MessageTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -74,7 +72,7 @@ namespace StockSharp.Alerts
 		/// <see cref="DependencyProperty"/> for <see cref="AlertSettingsPanel.Property"/>.
 		/// </summary>
 		public static readonly DependencyProperty PropertyProperty =
-			DependencyProperty.Register("Property", typeof(PropertyInfo), typeof(AlertSettingsPanel), new PropertyMetadata(null, PropertyChanged));
+			DependencyProperty.Register(nameof(Property), typeof(PropertyInfo), typeof(AlertSettingsPanel), new PropertyMetadata(null, PropertyChanged));
 
 		private static void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -91,7 +89,7 @@ namespace StockSharp.Alerts
 		/// <see cref="DependencyProperty"/> for <see cref="AlertSettingsPanel.Operator"/>.
 		/// </summary>
 		public static readonly DependencyProperty OperatorProperty =
-			DependencyProperty.Register("Operator", typeof(ComparisonOperator?), typeof(AlertSettingsPanel), new PropertyMetadata(null, OperatorChanged));
+			DependencyProperty.Register(nameof(Operator), typeof(ComparisonOperator?), typeof(AlertSettingsPanel), new PropertyMetadata(null, OperatorChanged));
 
 		private static void OperatorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -99,10 +97,10 @@ namespace StockSharp.Alerts
 		}
 
 		/// <summary>
-		/// <see cref="DependencyProperty"/> for <see cref="AlertSettingsPanel.Value"/>.
+		/// <see cref="DependencyProperty"/> for <see cref="Value"/>.
 		/// </summary>
 		public static readonly DependencyProperty ValueProperty =
-			DependencyProperty.Register("Value", typeof(object), typeof(AlertSettingsPanel), new PropertyMetadata(null, ValueChanged));
+			DependencyProperty.Register(nameof(Value), typeof(object), typeof(AlertSettingsPanel), new PropertyMetadata(null, ValueChanged));
 
 		private static void ValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -114,7 +112,7 @@ namespace StockSharp.Alerts
 			else if (ctrl.TextValue.Visibility == Visibility.Visible)
 				ctrl.TextValue.Text = (string)value;
 			else if (ctrl.TimeValue.Visibility == Visibility.Visible)
-				ctrl.TimeValue.Value = (TimeSpan?)value;
+				ctrl.TimeValue.Value = DateTime.Today + (TimeSpan?)value;
 			else if (ctrl.DateValue.Visibility == Visibility.Visible)
 				ctrl.DateValue.Value = (DateTime?)value;
 			//else if (ctrl.SecurityValue.Visibility == Visibility.Visible)
@@ -291,12 +289,12 @@ namespace StockSharp.Alerts
 		//	Value = SecurityValue.SelectedSecurity;
 		//}
 
-		private void TimeValue_OnValueChanged(object sender, PropertyChangedRoutedEventArgs<TimeSpan?> propertyChangedRoutedEventArgs)
+		private void TimeValue_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Value = TimeValue.Value;
 		}
 
-		private void DateValue_OnValueChanged(object sender, PropertyChangedRoutedEventArgs<DateTime?> propertyChangedRoutedEventArgs)
+		private void DateValue_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Value = DateValue.Value;
 		}

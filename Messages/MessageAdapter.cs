@@ -180,6 +180,12 @@ namespace StockSharp.Messages
 		public virtual bool OrderStatusRequired => this.IsMessageSupported(MessageTypes.OrderStatus);
 
 		/// <summary>
+		/// <see cref="OrderCancelMessage.Volume"/> required to cancel orders.
+		/// </summary>
+		[Browsable(false)]
+		public virtual bool OrderCancelVolumeRequired { get; } = false;
+
+		/// <summary>
 		/// Gets a value indicating whether the connector supports security lookup.
 		/// </summary>
 		protected virtual bool IsSupportNativeSecurityLookup => false;
@@ -207,6 +213,7 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Connection tracking settings <see cref="IMessageAdapter"/> with a server.
 		/// </summary>
+		[CategoryLoc(LocalizedStrings.Str174Key)]
 		public ReConnectionSettings ReConnectionSettings { get; } = new ReConnectionSettings();
 
 		private IdGenerator _transactionIdGenerator;
@@ -247,6 +254,7 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Associated board code. The default is ALL.
 		/// </summary>
+		[CategoryLoc(LocalizedStrings.Str186Key)]
 		[DisplayNameLoc(LocalizedStrings.AssociatedSecurityBoardKey)]
 		[DescriptionLoc(LocalizedStrings.Str199Key)]
 		public string AssociatedBoardCode { get; set; } = "ALL";
@@ -324,52 +332,18 @@ namespace StockSharp.Messages
 						return;
 
 					case MessageTypes.OrderRegister:
-					{
-						var execMsg = ((OrderRegisterMessage)message).ToExecutionMessage();
-						execMsg.Error = ex;
-						execMsg.OrderState = OrderStates.Failed;
-						SendOutMessage(execMsg);
-
-						return;
-					}
-
 					case MessageTypes.OrderReplace:
-					{
-						var execMsg = ((OrderReplaceMessage)message).ToExecutionMessage();
-						execMsg.Error = ex;
-						execMsg.OrderState = OrderStates.Failed;
-						SendOutMessage(execMsg);
-
-						return;
-					}
-
-					case MessageTypes.OrderPairReplace:
-					{
-						var execMsg = ((OrderPairReplaceMessage)message).ToExecutionMessage();
-						execMsg.Error = ex;
-						execMsg.OrderState = OrderStates.Failed;
-						SendOutMessage(execMsg);
-
-						return;
-					}
-
 					case MessageTypes.OrderCancel:
-					{
-						var execMsg = ((OrderCancelMessage)message).ToExecutionMessage();
-						execMsg.Error = ex;
-						execMsg.OrderState = OrderStates.Failed;
-						SendOutMessage(execMsg);
-
-						return;
-					}
-
 					case MessageTypes.OrderGroupCancel:
 					{
-						var execMsg = ((OrderGroupCancelMessage)message).ToExecutionMessage();
-						execMsg.Error = ex;
-						execMsg.OrderState = OrderStates.Failed;
-						SendOutMessage(execMsg);
-
+						var replyMsg = ((OrderMessage)message).CreateReply();
+						SendOutErrorExecution(replyMsg, ex);
+						return;
+					}
+					case MessageTypes.OrderPairReplace:
+					{
+						var replyMsg = ((OrderPairReplaceMessage)message).Message1.CreateReply();
+						SendOutErrorExecution(replyMsg, ex);
 						return;
 					}
 
@@ -418,14 +392,14 @@ namespace StockSharp.Messages
 
 				SendOutError(ex);
 			}
+		}
 
-			if (message.IsBack)
-			{
-				message.IsBack = false;
-
-				// time msg should be return back
-				SendOutMessage(message);
-			}
+		private void SendOutErrorExecution(ExecutionMessage execMsg, Exception ex)
+		{
+			execMsg.ServerTime = CurrentTime;
+			execMsg.Error = ex;
+			execMsg.OrderState = OrderStates.Failed;
+			SendOutMessage(execMsg);
 		}
 
 		/// <summary>
@@ -456,7 +430,7 @@ namespace StockSharp.Messages
 			}
 
 			_prevTime = message.LocalTime;
-			NewOutMessage.SafeInvoke(message);
+			NewOutMessage?.Invoke(message);
 		}
 
 		/// <summary>
@@ -484,7 +458,7 @@ namespace StockSharp.Messages
 		/// <param name="error">Error detais.</param>
 		protected void SendOutError(Exception error)
 		{
-			SendOutMessage(new ErrorMessage { Error = error });
+			SendOutMessage(error.ToErrorMessage());
 		}
 
 		/// <summary>
@@ -530,9 +504,9 @@ namespace StockSharp.Messages
 		/// <param name="storage">Settings storage.</param>
 		public override void Load(SettingsStorage storage)
 		{
-			HeartbeatInterval = storage.GetValue<TimeSpan>("HeartbeatInterval");
-			SupportedMessages = storage.GetValue<string[]>("SupportedMessages").Select(i => i.To<MessageTypes>()).ToArray();
-			AssociatedBoardCode = storage.GetValue("AssociatedBoardCode", AssociatedBoardCode);
+			HeartbeatInterval = storage.GetValue<TimeSpan>(nameof(HeartbeatInterval));
+			SupportedMessages = storage.GetValue<string[]>(nameof(SupportedMessages)).Select(i => i.To<MessageTypes>()).ToArray();
+			AssociatedBoardCode = storage.GetValue(nameof(AssociatedBoardCode), AssociatedBoardCode);
 
 			base.Load(storage);
 		}
@@ -543,9 +517,9 @@ namespace StockSharp.Messages
 		/// <param name="storage">Settings storage.</param>
 		public override void Save(SettingsStorage storage)
 		{
-			storage.SetValue("HeartbeatInterval", HeartbeatInterval);
-			storage.SetValue("SupportedMessages", SupportedMessages.Select(t => t.To<string>()).ToArray());
-			storage.SetValue("AssociatedBoardCode", AssociatedBoardCode);
+			storage.SetValue(nameof(HeartbeatInterval), HeartbeatInterval);
+			storage.SetValue(nameof(SupportedMessages), SupportedMessages.Select(t => t.To<string>()).ToArray());
+			storage.SetValue(nameof(AssociatedBoardCode), AssociatedBoardCode);
 
 			base.Save(storage);
 		}

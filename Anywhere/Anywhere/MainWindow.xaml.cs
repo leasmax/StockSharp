@@ -23,7 +23,6 @@ namespace StockSharp.Anywhere
     using System.Runtime.CompilerServices;
     using System.Security;
 
-    using Ecng.Collections;
     using Ecng.Common;
     using Ecng.Xaml;
 
@@ -38,12 +37,9 @@ namespace StockSharp.Anywhere
     {
         public Security Security { set; get; }
 
-        public string SecurityId
-        {
-            get { return Security.Id; }
-        }
+        public string SecurityId => Security.Id;
 
-        public bool Trades { set; get; }
+	    public bool Trades { set; get; }
         public bool MarketDepth { set; get; }
         public bool Level1 { set; get; }
         public bool Orders { set; get; }
@@ -87,24 +83,15 @@ namespace StockSharp.Anywhere
                 Address = QuikTrader.DefaultLuaAddress,
                 TargetCompId = "StockSharpTS",
                 SenderCompId = "quik",
-                ExchangeBoard = ExchangeBoard.Forts,
-                Version = FixVersions.Fix44_Lua,
-                RequestAllPortfolios = true,
-                MarketData = FixMarketData.None
             };
 
-            _messAdapter = new FixMessageAdapter(new MillisecondIncrementalIdGenerator())
+            _messAdapter = new LuaFixMarketDataMessageAdapter(new MillisecondIncrementalIdGenerator())
             {
                 Login = "quik",
                 Password = "quik".To<SecureString>(),
                 Address = QuikTrader.DefaultLuaAddress,
                 TargetCompId = "StockSharpMD",
                 SenderCompId = "quik",
-                ExchangeBoard = ExchangeBoard.Forts,
-                Version = FixVersions.Fix44_Lua,
-                RequestAllSecurities = true,
-                RequestAllPortfolios = false,
-                MarketData = FixMarketData.MarketData
             };
 
             _messAdapter.AddSupportedMessage(MessageTypes.Connect);
@@ -185,27 +172,16 @@ namespace StockSharp.Anywhere
 
                         var execMsg = (ExecutionMessage)message;
 
-                        switch (execMsg.ExecutionType)
-                        {
-                            case ExecutionTypes.Tick:
-                            {
-                                execMsg.WriteTrade();
+		                if (execMsg.ExecutionType == ExecutionTypes.Tick)
+			                execMsg.WriteTrade();
+		                else
+		                {
+							if (execMsg.HasOrderInfo())
+								execMsg.WriteOrder();
 
-                                break;
-                            }
-                            case ExecutionTypes.Trade:
-                            {
-                                execMsg.WriteMyTrade();
-
-                                break;
-                            }
-                            case ExecutionTypes.Order:
-                            {
-                                execMsg.WriteOrder();
-
-                                break;
-                            }
-                        }
+							if (execMsg.HasTradeInfo())
+								execMsg.WriteMyTrade();
+						}
 
                         break;
 

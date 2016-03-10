@@ -183,6 +183,9 @@ namespace StockSharp.BusinessEntities
 				if (_priceStep == value)
 					return;
 
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(value));
+
 				_priceStep = value;
 				Notify("PriceStep");
 			}
@@ -206,6 +209,9 @@ namespace StockSharp.BusinessEntities
 			{
 				if (_volumeStep == value)
 					return;
+
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(value));
 
 				_volumeStep = value;
 				Notify("VolumeStep");
@@ -231,6 +237,9 @@ namespace StockSharp.BusinessEntities
 				if (_multiplier == value)
 					return;
 
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(value));
+
 				_multiplier = value;
 				Notify("Multiplier");
 			}
@@ -255,6 +264,9 @@ namespace StockSharp.BusinessEntities
 			{
 				if (_decimals == value)
 					return;
+
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(value));
 
 				_decimals = value;
 				Notify("Decimals");
@@ -420,6 +432,9 @@ namespace StockSharp.BusinessEntities
 			{
 				if (_strike == value)
 					return;
+
+				if (value < 0)
+					throw new ArgumentOutOfRangeException(nameof(value));
 
 				_strike = value;
 				Notify("Strike");
@@ -752,10 +767,9 @@ namespace StockSharp.BusinessEntities
 		/// </summary>
 		[Browsable(false)]
 		//[Obsolete("Необходимо использовать метод IConnector.GetSecurityValue.")]
-		public MarketDepthPair BestPair
-		{
-			get { return new MarketDepthPair(this, BestBid, BestAsk); }
-		}
+		[DisplayNameLoc(LocalizedStrings.BestPairKey)]
+		[DescriptionLoc(LocalizedStrings.BestPairKey, true)]
+		public MarketDepthPair BestPair => new MarketDepthPair(this, BestBid, BestAsk);
 
 		private SecurityStates? _state;
 
@@ -888,28 +902,28 @@ namespace StockSharp.BusinessEntities
 			}
 		}
 
-		[field: NonSerialized]
-		private IConnector _connector;
+		//[field: NonSerialized]
+		//private IConnector _connector;
 
-		/// <summary>
-		/// Connection to the trading system, through which this instrument has been downloaded.
-		/// </summary>
-		[Ignore]
-		[XmlIgnore]
-		[Browsable(false)]
-		[Obsolete("The property Connector was obsoleted and is always null.")]
-		public IConnector Connector
-		{
-			get { return _connector; }
-			set
-			{
-				if (_connector == value)
-					return;
+		///// <summary>
+		///// Connection to the trading system, through which this instrument has been downloaded.
+		///// </summary>
+		//[Ignore]
+		//[XmlIgnore]
+		//[Browsable(false)]
+		//[Obsolete("The property Connector was obsoleted and is always null.")]
+		//public IConnector Connector
+		//{
+		//	get { return _connector; }
+		//	set
+		//	{
+		//		if (_connector == value)
+		//			return;
 
-				_connector = value;
-				Notify("Trader");
-			}
-		}
+		//		_connector = value;
+		//		Notify("Trader");
+		//	}
+		//}
 
 		private decimal? _impliedVolatility;
 
@@ -1580,7 +1594,7 @@ namespace StockSharp.BusinessEntities
 		/// <param name="propName">Property name.</param>
 		protected void Notify(string propName)
 		{
-			_propertyChanged.SafeInvoke(this, propName);
+			_propertyChanged?.Invoke(this, propName);
 		}
 	}
 }

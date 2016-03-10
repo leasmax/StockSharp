@@ -19,6 +19,7 @@ namespace SampleFix
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.IO;
+	using System.Security;
 	using System.Windows;
 
 	using Ecng.Common;
@@ -70,8 +71,11 @@ namespace SampleFix
 				Trader.Load(new XmlSerializer<SettingsStorage>().Deserialize(_settingsFile));
 			}
 
-			MarketDataSessionSettings.SelectedObject = ((ChannelMessageAdapter)Trader.MarketDataAdapter).InnerAdapter;
-			TransactionSessionSettings.SelectedObject = ((ChannelMessageAdapter)Trader.TransactionAdapter).InnerAdapter;
+			MarketDataSessionSettings.SelectedObject = Trader.MarketDataAdapter;
+			TransactionSessionSettings.SelectedObject = Trader.TransactionAdapter;
+
+			MarketDataSupportedMessages.Adapter = Trader.MarketDataAdapter;
+			TransactionSupportedMessages.Adapter = Trader.TransactionAdapter;
 
 			Instance = this;
 
@@ -186,7 +190,10 @@ namespace SampleFix
 			{
 				new XmlSerializer<SettingsStorage>().Serialize(Trader.Save(), _settingsFile);
 
-				Trader.Connect();
+				if (!NewPassword.Password.IsEmpty())
+					Trader.SendInMessage(new ChangePasswordMessage { NewPassword = NewPassword.Password.To<SecureString>() });
+				else
+					Trader.Connect();
 			}
 			else if (Trader.ConnectionState == ConnectionStates.Connected)
 			{

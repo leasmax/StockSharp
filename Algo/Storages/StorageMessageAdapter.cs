@@ -68,7 +68,7 @@ namespace StockSharp.Algo.Storages
 
 				foreach (var pair in GetTransactions())
 				{
-					GetStorage<ExecutionMessage>(pair.Key, ExecutionTypes.Order).Save(pair.Value);
+					GetStorage<ExecutionMessage>(pair.Key, ExecutionTypes.Transaction).Save(pair.Value);
 				}
 
 				foreach (var pair in GetOrderBooks())
@@ -143,10 +143,7 @@ namespace StockSharp.Algo.Storages
 
 		private IMarketDataStorage GetStorage(SecurityId securityId, Type messageType, object arg)
 		{
-			var security = _entityRegistry.Securities.ReadBySecurityId(securityId);
-
-			if (security == null)
-				security = TryCreateSecurity(securityId);
+			var security = _entityRegistry.Securities.ReadBySecurityId(securityId) ?? TryCreateSecurity(securityId);
 
 			if (security == null)
 				throw new InvalidOperationException(Localization.LocalizedStrings.Str704Params.Put(securityId));
@@ -192,18 +189,23 @@ namespace StockSharp.Algo.Storages
 			if (DaysLoad == TimeSpan.Zero)
 				return;
 
+			var today = DateTime.UtcNow.Date;
+
+			var from = (DateTimeOffset)(today - DaysLoad);
+			var to = DateTimeOffset.Now;
+
 			foreach (var secId in requiredSecurities)
 			{
 				GetStorage<ExecutionMessage>(secId, ExecutionTypes.Tick)
-					.Load(DateTimeOffset.Now - DaysLoad, DateTimeOffset.Now)
+					.Load(from, to)
 					.ForEach(RaiseStorageMessage);
 
-				GetStorage<ExecutionMessage>(secId, ExecutionTypes.Order)
-					.Load(DateTimeOffset.Now - DaysLoad, DateTimeOffset.Now)
+				GetStorage<ExecutionMessage>(secId, ExecutionTypes.Transaction)
+					.Load(from, to)
 					.ForEach(RaiseStorageMessage);
 
 				GetStorage<ExecutionMessage>(secId, ExecutionTypes.OrderLog)
-					.Load(DateTimeOffset.Now - DaysLoad, DateTimeOffset.Now)
+					.Load(from, to)
 					.ForEach(RaiseStorageMessage);
 			}
 
@@ -353,7 +355,7 @@ namespace StockSharp.Algo.Storages
 
 			var security = new Security
 			{
-				Id = securityId.SecurityCode + "@" + securityId.BoardCode,
+				Id = securityId.ToStringId(),
 				Code = securityId.SecurityCode,
 				Board = ExchangeBoard.GetOrCreateBoard(securityId.BoardCode),
 				ExtensionInfo = new Dictionary<object, object>()

@@ -160,7 +160,7 @@ namespace StockSharp.Algo.Storages.Csv
 			Serialize(stream, data.Cast<TData>(), metaInfo);
 		}
 
-		IEnumerableEx IMarketDataSerializer.Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
+		IEnumerable IMarketDataSerializer.Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
 		{
 			return Deserialize(stream, metaInfo);
 		}
@@ -175,21 +175,19 @@ namespace StockSharp.Algo.Storages.Csv
 		{
 			CultureInfo.InvariantCulture.DoInCulture(() =>
 			{
-				var writer = new StreamWriter(stream, Encoding);
+				var writer = new CsvFileWriter(stream, Encoding);
 
-				var appendLine = metaInfo.Count > 0;
-
-				foreach (var item in data)
+				try
 				{
-					if (appendLine)
-						writer.WriteLine();
-					else
-						appendLine = true;
-
-					Write(writer, item);
+					foreach (var item in data)
+					{
+						Write(writer, item);
+					}
 				}
-
-				writer.Flush();
+				finally
+				{
+					writer.Writer.Flush();
+				}
 			});
 		}
 
@@ -198,7 +196,7 @@ namespace StockSharp.Algo.Storages.Csv
 		/// </summary>
 		/// <param name="writer">CSV writer.</param>
 		/// <param name="data">Data.</param>
-		protected abstract void Write(TextWriter writer, TData data);
+		protected abstract void Write(CsvFileWriter writer, TData data);
 
 		private class CsvEnumerator : SimpleEnumerator<TData>
 		{
@@ -239,7 +237,7 @@ namespace StockSharp.Algo.Storages.Csv
 		/// <param name="stream">The stream.</param>
 		/// <param name="metaInfo">Meta-information on data for one day.</param>
 		/// <returns>Data.</returns>
-		public virtual IEnumerableEx<TData> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
+		public virtual IEnumerable<TData> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
 		{
 			// TODO (переделать в будущем)
 			var copy = new MemoryStream();
@@ -252,9 +250,7 @@ namespace StockSharp.Algo.Storages.Csv
 			//	new CsvReader(copy, _encoding, SecurityId, metaInfo.Date.Date, _executionType, _candleArg, _members))
 			//	.ToEx(metaInfo.Count);
 
-			return new SimpleEnumerable<TData>(() =>
-				new CsvEnumerator(this, new FastCsvReader(copy, Encoding), metaInfo))
-				.ToEx(metaInfo.Count);
+			return new SimpleEnumerable<TData>(() => new CsvEnumerator(this, new FastCsvReader(copy, Encoding), metaInfo));
 		}
 
 		/// <summary>
@@ -267,6 +263,11 @@ namespace StockSharp.Algo.Storages.Csv
 
 		/// <summary>
 		/// <see cref="DateTime"/> format.
+		/// </summary>
+		public const string DateFormat = "yyyyMMdd";
+
+		/// <summary>
+		/// <see cref="TimeSpan"/> format.
 		/// </summary>
 		public const string TimeFormat = CsvHelper.TimeFormat;
 	}

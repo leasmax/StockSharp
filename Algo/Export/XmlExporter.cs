@@ -62,7 +62,7 @@ namespace StockSharp.Algo.Export
 						writer.WriteAttribute("serverTime", trade.ServerTime.ToString(_timeFormat));
 						writer.WriteAttribute("localTime", trade.LocalTime.ToString(_timeFormat));
 						writer.WriteAttribute("price", trade.TradePrice);
-						writer.WriteAttribute("volume", trade.Volume);
+						writer.WriteAttribute("volume", trade.TradeVolume);
 
 						if (trade.OriginSide != null)
 							writer.WriteAttribute("originSide", trade.OriginSide.Value);
@@ -88,7 +88,7 @@ namespace StockSharp.Algo.Export
 						writer.WriteAttribute("serverTime", item.ServerTime.ToString(_timeFormat));
 						writer.WriteAttribute("localTime", item.LocalTime.ToString(_timeFormat));
 						writer.WriteAttribute("price", item.OrderPrice);
-						writer.WriteAttribute("volume", item.Volume);
+						writer.WriteAttribute("volume", item.OrderVolume);
 						writer.WriteAttribute("side", item.Side);
 						writer.WriteAttribute("state", item.OrderState);
 						writer.WriteAttribute("timeInForce", item.TimeInForce);
@@ -108,8 +108,7 @@ namespace StockSharp.Algo.Export
 
 					break;
 				}
-				case ExecutionTypes.Order:
-				case ExecutionTypes.Trade:
+				case ExecutionTypes.Transaction:
 				{
 					Do(messages, "transactions", (writer, item) =>
 					{
@@ -118,16 +117,39 @@ namespace StockSharp.Algo.Export
 						writer.WriteAttribute("serverTime", item.ServerTime.ToString(_timeFormat));
 						writer.WriteAttribute("localTime", item.LocalTime.ToString(_timeFormat));
 						writer.WriteAttribute("portfolio", item.PortfolioName);
+						writer.WriteAttribute("clientCode", item.ClientCode);
+						writer.WriteAttribute("brokerCode", item.BrokerCode);
+						writer.WriteAttribute("depoName", item.DepoName);
 						writer.WriteAttribute("transactionId", item.TransactionId);
-						writer.WriteAttribute("id", item.OrderId == null ? item.OrderStringId : item.OrderId.To<string>());
+						writer.WriteAttribute("originalTransactionId", item.OriginalTransactionId);
+						writer.WriteAttribute("orderId", item.OrderId == null ? item.OrderStringId : item.OrderId.To<string>());
+						writer.WriteAttribute("derivedOrderId", item.DerivedOrderId == null ? item.DerivedOrderStringId : item.DerivedOrderId.To<string>());
 						writer.WriteAttribute("orderPrice", item.OrderPrice);
-						writer.WriteAttribute("volume", item.Volume);
+						writer.WriteAttribute("orderVolume", item.OrderVolume);
+						writer.WriteAttribute("orderType", item.OrderType);
+						writer.WriteAttribute("orderState", item.OrderState);
+						writer.WriteAttribute("orderStatus", item.OrderStatus);
+						writer.WriteAttribute("visibleVolume", item.VisibleVolume);
 						writer.WriteAttribute("balance", item.Balance);
 						writer.WriteAttribute("side", item.Side);
-						writer.WriteAttribute("type", item.OrderType);
-						writer.WriteAttribute("state", item.OrderState);
+						writer.WriteAttribute("originSide", item.OriginSide);
 						writer.WriteAttribute("tradeId", item.TradeId == null ? item.TradeStringId : item.TradeId.To<string>());
 						writer.WriteAttribute("tradePrice", item.TradePrice);
+						writer.WriteAttribute("tradeVolume", item.TradeVolume);
+						writer.WriteAttribute("tradeStatus", item.TradeStatus);
+						writer.WriteAttribute("isOrder", item.HasOrderInfo);
+						writer.WriteAttribute("isTrade", item.HasTradeInfo);
+						writer.WriteAttribute("commission", item.Commission);
+						writer.WriteAttribute("pnl", item.PnL);
+						writer.WriteAttribute("position", item.Position);
+						writer.WriteAttribute("latency", item.Latency);
+						writer.WriteAttribute("slippage", item.Slippage);
+						writer.WriteAttribute("error", item.Error?.Message);
+						writer.WriteAttribute("currency", item.Currency);
+						writer.WriteAttribute("openInterest", item.OpenInterest);
+						writer.WriteAttribute("isCancelled", item.IsCancelled);
+						writer.WriteAttribute("isSystem", item.IsSystem);
+						writer.WriteAttribute("isUpTick", item.IsUpTick);
 
 						writer.WriteEndElement();
 					});
@@ -181,7 +203,7 @@ namespace StockSharp.Algo.Export
 				writer.WriteAttribute("localTime", message.LocalTime.ToString(_timeFormat));
 
 				foreach (var pair in message.Changes)
-					writer.WriteAttribute(pair.Key.ToString(), pair.Value is DateTime ? ((DateTime)pair.Value).ToString(_timeFormat) : pair.Value);
+					writer.WriteAttribute(pair.Key.ToString(), (pair.Value as DateTime?)?.ToString(_timeFormat) ?? pair.Value);
 
 				writer.WriteEndElement();
 			});

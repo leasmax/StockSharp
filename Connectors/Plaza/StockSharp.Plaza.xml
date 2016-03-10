@@ -5811,6 +5811,11 @@
             Идентификатор клиентского ПО. Используется при режиме <see cref="P:StockSharp.Plaza.PlazaMessageAdapter.IsCGate" />.
             </summary>
     </member>
+    <member name="P:StockSharp.Plaza.PlazaMessageAdapter.IsDemo">
+      <summary>
+            Подключаться ли к демо торгам вместо сервера с реальной торговлей.
+            </summary>
+    </member>
     <member name="P:StockSharp.Plaza.PlazaMessageAdapter.Login">
       <summary>
             Логин. Используется в случае авторизованного подключения к роутеру.
@@ -6835,6 +6840,13 @@
             </summary>
       <returns>Транзакция.</returns>
     </member>
+    <member name="M:StockSharp.Plaza.TransactionFactory.CreateHeartbeat(StockSharp.Messages.TimeMessage)">
+      <summary>
+            Создать транзакцию оповещения сервера.
+            </summary>
+      <param name="timeMessage">Сообщение оповещения сервера.</param>
+      <returns>Транзакция.</returns>
+    </member>
     <member name="M:StockSharp.Plaza.TransactionFactory.CreateTransaction(System.String,System.Nullable{System.Int64},StockSharp.Messages.Message,System.String)">
       <summary>
             Создать транзакцию.
@@ -7139,6 +7151,11 @@
     <member name="P:StockSharp.Plaza.PlazaTrader.CGateKey">
       <summary>
             Идентификатор клиентского ПО. Используется при режиме <see cref="P:StockSharp.Plaza.PlazaTrader.IsCGate" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Plaza.PlazaTrader.IsDemo">
+      <summary>
+            Подключаться ли к демо торгам вместо сервера с реальной торговлей.
             </summary>
     </member>
     <member name="P:StockSharp.Plaza.PlazaTrader.Login">

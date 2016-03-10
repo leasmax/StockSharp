@@ -4,6 +4,289 @@
     <name>StockSharp.Fix</name>
   </assembly>
   <members>
+    <member name="T:StockSharp.Fix.Dialects.BaseDialect">
+      <summary>
+            Base class describing the dialect of the FIX protocol.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.#ctor(System.String,System.String,System.IO.Stream,System.Text.Encoding,Ecng.Common.IncrementalIdGenerator,System.String,StockSharp.Fix.FixFormats,System.TimeSpan,System.Boolean,System.String,System.Security.SecureString,System.TimeZoneInfo,System.String,System.String,System.String,System.String)">
+      <summary>
+            Initialize <see cref="T:StockSharp.Fix.Dialects.BaseDialect" />.
+            </summary>
+      <param name="senderCompId">Sender ID.</param>
+      <param name="targetCompId">Target ID.</param>
+      <param name="stream">Stream.</param>
+      <param name="encoding">Encoding.</param>
+      <param name="idGenerator">Sequence id generator.</param>
+      <param name="version">FIX version.</param>
+      <param name="format">FIX protocol format.</param>
+      <param name="heartbeatInterval">Heartbeat interval.</param>
+      <param name="isResetCounter">Should the number counter be cleared.</param>
+      <param name="login">Login.</param>
+      <param name="password">Password.</param>
+      <param name="timeZone">Information about the time zone where the exchange is located.</param>
+      <param name="timeStampFormat">UTC time stamp format.</param>
+      <param name="timeFormat">UTC time format.</param>
+      <param name="dateFormat">UTC date format.</param>
+      <param name="exchangeBoard">Board, where securities are traded.</param>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.TimeStampFormat">
+      <summary>
+            UTC time stamp format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.TimeFormat">
+      <summary>
+            UTC time format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.DateFormat">
+      <summary>
+            UTC date format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.TimeZone">
+      <summary>
+            Information about the time zone where the exchange is located.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.Format">
+      <summary>
+            FIX protocol format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.SecurityLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.SecurityLookupMessage" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.PortfolioLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.PortfolioLookupMessage" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.OrderLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.OrderStatusMessage" /> for mass orders.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.OrderCancelVolumeRequired">
+      <summary>
+        <see cref="P:StockSharp.Messages.OrderCancelMessage.Volume" /> required to cancel orders.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.OnRead(StockSharp.Fix.Native.IFixReader,System.String,Ecng.Common.AllocationArray{StockSharp.Messages.Message})">
+      <summary>
+            Read next message from FIX protocol.
+            </summary>
+      <param name="reader">The reader of data recorded in the FIX protocol format.</param>
+      <param name="msgType">Message type.</param>
+      <param name="messages">The allocation array.</param>
+      <returns>
+        <see langword="true" />, if the messages was read successfully, otherwise, <see langword="false" />.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.OnWrite(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.Message)">
+      <summary>
+            Write the specified message into FIX protocol.
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="message">The message.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteLogonRequest(StockSharp.Fix.Native.IFixWriter)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Logon" /> message (request).
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteLogoutRequest(StockSharp.Fix.Native.IFixWriter,System.String)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Logout" /> message (request).
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="text">The text of reason.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteSequenceReset(StockSharp.Fix.Native.IFixWriter)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.SequenceReset" /> message (request).
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteResendRequest(StockSharp.Fix.Native.IFixWriter,System.Int32,System.Int32)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.ResendRequest" /> message.
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="begin">The original message identifier.</param>
+      <param name="end">The last message identifier.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteUserRequestChangePassword(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.ChangePasswordMessage,System.String,System.String)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.UserRequest" /> message.
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="message">Password change message.</param>
+      <param name="userName">Current user name.</param>
+      <param name="password">Current password.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.WriteTimeMessage(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.TimeMessage)">
+      <summary>
+            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Heartbeat" /> or <see cref="F:StockSharp.Fix.Native.FixMessages.TestRequest" /> message.
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="timeMsg">Heartbeat message.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.DisposeManaged">
+      <summary>
+            Release resources.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.BaseDialect.SecuritiesSinglePacket">
+      <summary>
+            Security message contain information for all requested securities.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.ReadExecutionReport(StockSharp.Fix.Native.IFixReader,StockSharp.Fix.Native.ExecutionReport,System.String,System.Func{StockSharp.Fix.Native.FixTags,System.Boolean})">
+      <summary>
+            Read the <see cref="F:StockSharp.Fix.Native.FixMessages.ExecutionReport" /> message.
+            </summary>
+      <param name="reader">The reader of data recorded in the FIX protocol format.</param>
+      <param name="report">
+        <see cref="T:StockSharp.Fix.Native.ExecutionReport" /> instance.</param>
+      <param name="transactTimeFormat">Format for <see cref="F:StockSharp.Fix.Native.FixTags.TransactTime" /> field.</param>
+      <param name="extraTagProcess">
+      </param>
+      <returns>
+        <see langword="true" />, if the messages was read successfully, otherwise, <see langword="false" />.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.BaseDialect.ProcessExecutionReport(StockSharp.Fix.Native.ExecutionReport,Ecng.Common.AllocationArray{StockSharp.Messages.Message},System.Action{StockSharp.Messages.ExecutionMessage})">
+      <summary>
+            Process <see cref="T:StockSharp.Fix.Native.ExecutionReport" /> instance.
+            </summary>
+      <param name="report">
+        <see cref="T:StockSharp.Fix.Native.ExecutionReport" /> instance.</param>
+      <param name="messages">The allocation array.</param>
+      <param name="processExecMsg">Post handle an <see cref="T:StockSharp.Messages.ExecutionMessage" /> instance.</param>
+      <returns>
+        <see langword="true" />, if the messages was read successfully, otherwise, <see langword="false" />.</returns>
+    </member>
+    <member name="T:StockSharp.Fix.Dialects.DefaultDialect">
+      <summary>
+            The default implementation of <see cref="T:StockSharp.Fix.Dialects.IFixDialect" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.DefaultDialect.#ctor(System.String,System.String,System.IO.Stream,Ecng.Common.IncrementalIdGenerator,System.TimeSpan,System.Boolean,System.String,System.Security.SecureString,System.TimeZoneInfo,System.Func{StockSharp.Messages.OrderCondition})">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Fix.Dialects.DefaultDialect" />.
+            </summary>
+      <param name="senderCompId">Sender ID.</param>
+      <param name="targetCompId">Target ID.</param>
+      <param name="stream">Stream.</param>
+      <param name="idGenerator">Sequence id generator.</param>
+      <param name="heartbeatInterval">Heartbeat interval.</param>
+      <param name="isResetCounter">Should the number counter be cleared.</param>
+      <param name="login">Login.</param>
+      <param name="password">Password.</param>
+      <param name="timeZone">Information about the time zone where the exchange is located.</param>
+      <param name="createOrderCondition">Order condition creating handler.</param>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.DefaultDialect.OnWrite(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.Message)">
+      <summary>
+            Write the specified message into FIX protocol.
+            </summary>
+      <param name="writer">The recorder of data in the FIX protocol format.</param>
+      <param name="message">The message.</param>
+      <returns>
+        <see cref="T:StockSharp.Fix.Native.FixMessages" /> value.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.DefaultDialect.WriteOrderCondition(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.OrderRegisterMessage)">
+      <summary>
+            To record data by the order condition.
+            </summary>
+      <param name="writer">FIX data writer.</param>
+      <param name="regMsg">The message containing the information for the order registration.</param>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.DefaultDialect.ReadOrderCondition(StockSharp.Fix.Native.IFixReader,StockSharp.Fix.Native.FixTags,System.Func{StockSharp.Messages.OrderCondition})">
+      <summary>
+            To read the order condition <see cref="T:StockSharp.Messages.OrderCondition" />.
+            </summary>
+      <param name="reader">Data reader.</param>
+      <param name="tag">Tag.</param>
+      <param name="getCondition">The function returning the order condition.</param>
+      <returns>Whether the data was successfully processed.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.DefaultDialect.OnRead(StockSharp.Fix.Native.IFixReader,System.String,Ecng.Common.AllocationArray{StockSharp.Messages.Message})">
+      <summary>
+            Read next message from FIX protocol.
+            </summary>
+      <param name="reader">The reader of data recorded in the FIX protocol format.</param>
+      <param name="msgType">Message type.</param>
+      <param name="messages">The allocation array.</param>
+      <returns>
+        <see langword="true" />, if the messages was read successfully, otherwise, <see langword="false" />.</returns>
+    </member>
+    <member name="T:StockSharp.Fix.Dialects.IFixDialect">
+      <summary>
+            The interface describing the dialect of the FIX protocol.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.Writer">
+      <summary>
+            The recorder of data in the FIX protocol format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.Reader">
+      <summary>
+            The reader of data recorded in the FIX protocol format.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.SecurityLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.SecurityLookupMessage" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.PortfolioLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.PortfolioLookupMessage" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.OrderLookup">
+      <summary>
+            Supports <see cref="T:StockSharp.Messages.OrderStatusMessage" /> for mass orders.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Dialects.IFixDialect.OrderCancelVolumeRequired">
+      <summary>
+        <see cref="P:StockSharp.Messages.OrderCancelMessage.Volume" /> required to cancel orders.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.IFixDialect.Write(StockSharp.Messages.Message)">
+      <summary>
+            Write the specified message into FIX protocol.
+            </summary>
+      <param name="message">The message.</param>
+      <returns>
+        <see langword="true" /> if the specified message was processed successfully, otherwise, <see langword="false" />.</returns>
+    </member>
+    <member name="M:StockSharp.Fix.Dialects.IFixDialect.Read">
+      <summary>
+            Read next messages from FIX protocol.
+            </summary>
+      <returns>The messages.</returns>
+    </member>
     <member name="T:StockSharp.Fix.FixServer">
       <summary>
             FIX server.
@@ -31,7 +314,7 @@
     </member>
     <member name="M:StockSharp.Fix.FixServer.ReadOrderCondition(StockSharp.Fix.Native.IFixReader,StockSharp.Fix.Native.FixTags,System.Func{StockSharp.Messages.OrderCondition})">
       <summary>
-            To read the order registration condition <see cref="P:StockSharp.Messages.OrderRegisterMessage.Condition" />.
+            To read the order condition <see cref="T:StockSharp.Messages.OrderCondition" />.
             </summary>
       <param name="reader">Data reader.</param>
       <param name="tag">Tag.</param>
@@ -128,6 +411,14 @@
       <param name="transactionId">Transaction ID.</param>
       <returns>Request identifier.</returns>
     </member>
+    <member name="M:StockSharp.Fix.FixServer.GetTransactionId(StockSharp.Fix.FixSession,System.String)">
+      <summary>
+            Get the transaction ID.
+            </summary>
+      <param name="session">The session.</param>
+      <param name="requestId">The request identifier.</param>
+      <returns>Transaction ID.</returns>
+    </member>
     <member name="M:StockSharp.Fix.FixServer.CreateTransactionId(StockSharp.Fix.FixSession,System.String)">
       <summary>
             Generate a new request identifier.
@@ -207,16 +498,6 @@
             Sender ID.
             </summary>
     </member>
-    <member name="P:StockSharp.Fix.FixSession.Version">
-      <summary>
-            Version FIX protocol.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixSession.Format">
-      <summary>
-            FIX protocol format.
-            </summary>
-    </member>
     <member name="P:StockSharp.Fix.FixSession.HeartBeat">
       <summary>
             The interval of the connection availability check. The default is 1 minute.
@@ -254,12 +535,12 @@
     </member>
     <member name="P:StockSharp.Fix.FixSession.ReadTimeout">
       <summary>
-            The timeout of getting data from the server. The default value is <see cref="F:Ecng.Common.SyncObject.InfiniteTimeSpan" />.
+            The timeout of getting data from the server. The default value is <see cref="F:System.TimeSpan.Zero" />.
             </summary>
     </member>
     <member name="P:StockSharp.Fix.FixSession.WriteTimeout">
       <summary>
-            The timeout of sending data to the server. The default value is <see cref="F:Ecng.Common.SyncObject.InfiniteTimeSpan" />.
+            The timeout of sending data to the server. The default value is <see cref="F:System.TimeSpan.Zero" />.
             </summary>
     </member>
     <member name="M:StockSharp.Fix.FixSession.Load(Ecng.Serialization.SettingsStorage)">
@@ -273,6 +554,51 @@
             Save settings.
             </summary>
       <param name="storage">Settings storage.</param>
+    </member>
+    <member name="T:StockSharp.Fix.FixVersions">
+      <summary>
+            FIX protocol versions.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix40">
+      <summary>
+            FIX 4.0.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix41">
+      <summary>
+            FIX 4.1.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix42">
+      <summary>
+            FIX 4.2.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix43">
+      <summary>
+            FIX 4.3.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix44">
+      <summary>
+            FIX 4.4.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix50">
+      <summary>
+            FIX 5.0.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix50Sp1">
+      <summary>
+            FIX 5.0 SP1.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.FixVersions.Fix50Sp2">
+      <summary>
+            FIX 5.0 SP2.
+            </summary>
     </member>
     <member name="T:StockSharp.Fix.Native.BaseFixReader">
       <summary>
@@ -2141,6 +2467,54 @@
       <summary>
       </summary>
     </member>
+    <member name="T:StockSharp.Fix.Native.MassCancelResponse">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelRequestRejected">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForASecurity">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForAnUnderlyingSecurity">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForAProduct">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForACficode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForASecuritytype">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForATradingSession">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelAllOrders">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForAMarket">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForAMarketSegment">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.MassCancelResponse.CancelOrdersForASecurityGroup">
+      <summary>
+      </summary>
+    </member>
     <member name="T:StockSharp.Fix.Native.PosReqType">
       <summary>
       </summary>
@@ -2981,6 +3355,357 @@
       <summary>
       </summary>
     </member>
+    <member name="T:StockSharp.Fix.Native.PartyIDSource">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.KoreanInvestorId">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.TaiwaneseQualifiedForeignInvestorIdQfiiFid">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.TaiwaneseTradingAcct">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.MalaysianCentralDepository">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.ChineseInvestorId">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.UkNationalInsuranceOrPensionNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.UsSocialSecurityNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.UsEmployerOrTaxIdNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.AustralianBusinessNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.AustralianTaxFileNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.Bic">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.GenerallyAcceptedMarketParticipantIdentifier">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.Proprietary">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.IsoCountryCode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.SettlementEntityLocation">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.Mic">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.CsdParticipantMemberCode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.PartyIDSource.DirectedBrokerThreeCharacterAcronymAsDefinedInIsitcEtcBestPracticeGuidelinesDocument">
+      <summary>
+      </summary>
+    </member>
+    <member name="T:StockSharp.Fix.Native.TrdRegTimestampType">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.ExecutionTime">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.TimeIn">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.TimeOut">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.BrokerReceipt">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.BrokerExecution">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.TrdRegTimestampType.DeskReceipt">
+      <summary>
+      </summary>
+    </member>
+    <member name="T:StockSharp.Fix.Native.SecurityIDSource">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Cusip">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Sedol">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Quik">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.IsinNumber">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.RicCode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.IsoCurrencyCode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.IsoCountryCode">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.ExchangeSymbol">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.ConsolidatedTapeAssociation">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.BloombergSymbol">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Wertpapier">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Dutch">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Valoren">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Sicovam">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Belgian">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.Common">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.ClearingHouse">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.IsdaFpmlProductSpecification">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.OptionPriceReportingAuthority">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.LetterOfCredit">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.IsdaFpmlProductUrl">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.SecurityIDSource.MarketplaceAssignedIdentifier">
+      <summary>
+      </summary>
+    </member>
+    <member name="T:StockSharp.Fix.Native.ExecutionReport">
+      <summary>
+            Execution report.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ExecType">
+      <summary>
+            Describes the purpose of the execution report <see cref="T:StockSharp.Fix.Native.ExecType" />.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.OrigClOrdId">
+      <summary>
+            Used to identify the previous order in cancel and cancel/replace requests.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.OrderId">
+      <summary>
+            Unique identifier for Order as assigned by sell-side (broker, exchange, ECN).
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ClOrdId">
+      <summary>
+            Unique identifier for Order as assigned by the buy-side (institution, broker, intermediary etc.).
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.OrderQty">
+      <summary>
+            Quantity ordered. This represents the number of shares for equities or par, face or nominal value for FI instruments.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.LeavesQty">
+      <summary>
+            Quantity open for further execution.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.ExecutionReport.CumQty">
+      <summary>
+            Total quantity (e.g. number of shares) filled.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.ExecutionReport.TrdRegTimestamp">
+      <summary>
+            Traded / Regulatory timestamp value.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.ExecutionReport.TrdRegTimestampType">
+      <summary>
+            Traded / Regulatory timestamp type.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Price">
+      <summary>
+            Price per unit of quantity (e.g. per share).
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Symbol">
+      <summary>
+            Ticker symbol. Common, "human understood" representation of the security.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.SecurityExchange">
+      <summary>
+            Market used to help identify a security.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.TradingSessionId">
+      <summary>
+            Identifier for Trading Session.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ExDestination">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.SendingTime">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.OrdType">
+      <summary>
+            Order type <see cref="T:StockSharp.Fix.Native.OrdType" />.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.TradeDate">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.TransactTime">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Account">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ClientId">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.PartyId">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.PartyRole">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.OrdStatus">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Side">
+      <summary>
+            Side of order <see cref="T:StockSharp.Fix.Native.Side" />.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.TimeInForce">
+      <summary>
+            Specifies how long the order remains in effect. Absence of this field is interpreted as DAY. NOTE not applicable to CIV Orders.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ExpireDate">
+      <summary>
+            Date of order expiration (last day the order can trade), always expressed in terms of the local market date.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ExpireTime">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.LastPx">
+      <summary>
+            Price of this (last) fill.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.LastQty">
+      <summary>
+            Quantity (e.g. shares) bought/sold on this (last) fill.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Commission">
+      <summary>
+            Commission.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.Text">
+      <summary>
+            Free format text string.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.ExecutionReport.ExecId">
+      <summary>
+            Unique identifier of execution message as assigned by sell-side (broker, exchange, ECN).
+            </summary>
+    </member>
     <member name="T:StockSharp.Fix.Native.FixMessages">
       <summary>
             FIX messages codes.
@@ -3172,327 +3897,6 @@
       <summary>
             The response to <see cref="F:StockSharp.Fix.Native.FixMessages.OrderMassCancelRequest" />.
             </summary>
-    </member>
-    <member name="T:StockSharp.Fix.Native.MDEntry">
-      <summary>
-            The market data string.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.Type">
-      <summary>
-            Data type. Available types <see cref="T:StockSharp.Fix.Native.MDEntryType" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.Price">
-      <summary>
-            Price.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.Size">
-      <summary>
-            Volume.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.Action">
-      <summary>
-            Action. Available types <see cref="T:StockSharp.Fix.Native.MDUpdateAction" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.Position">
-      <summary>
-            Position.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.EntryId">
-      <summary>
-            Identifier.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.TickDirection">
-      <summary>
-            The tick direction.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.SecurityId">
-      <summary>
-            Security ID.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.Native.MDEntry.OtherValue">
-      <summary>
-            The additional string value.
-            </summary>
-    </member>
-    <member name="T:StockSharp.Fix.Native.FixMessageWriter">
-      <summary>
-            The FIX messages recorder.
-            </summary>
-      <summary>
-            The FIX messages recorder.
-            </summary>
-      <summary>
-            The FIX messages recorder.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteCfhQuoteRequest(System.String,System.Boolean)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.QuoteRequest" /> CFH message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="isSubscribe">Is it a sign of subscription.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteQuoteRequest(System.String,StockSharp.Messages.SecurityId)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.QuoteRequest" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="securityId">Security ID.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteQuoteCancel(System.String,StockSharp.Messages.SecurityId)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.QuoteCancel" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="securityId">Security ID.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteMarketDataRequest(System.String,StockSharp.Messages.SecurityId,System.Boolean,System.Nullable{System.Int32},System.Char[])">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.MarketDataRequest" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="securityId">Security ID.</param>
-      <param name="isSubscribe">Is it a sign of subscription.</param>
-      <param name="bookDepth">Depth of book.</param>
-      <param name="types">Market-data types. Possible values <see cref="T:StockSharp.Fix.Native.MDEntryType" />.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteSecurityListRequest(StockSharp.Messages.SecurityLookupMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.SecurityListRequest" /> message (request).
-            </summary>
-      <param name="message">Search criterion.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteSecurityDefinitionRequest(StockSharp.Messages.SecurityLookupMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.SecurityDefinitionRequest" /> message (request).
-            </summary>
-      <param name="message">Search criterion.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteSecurityListResponse(System.String,System.String,System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.SecurityList" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="responseId">The response identifier.</param>
-      <param name="error">Error info.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteSecurityListResponse(System.String,System.String,System.Collections.Generic.ICollection{StockSharp.Messages.SecurityMessage})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.SecurityList" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="responseId">The response identifier.</param>
-      <param name="securityMessages">Information about securities.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteMarketDataSnapshotFullRefresh(StockSharp.Messages.SecurityId,System.String,System.DateTimeOffset,System.Collections.Generic.ICollection{StockSharp.Fix.Native.MDEntry})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.MarketDataSnapshotFullRefresh" /> message (response).
-            </summary>
-      <param name="securityId">Security ID.</param>
-      <param name="requestId">Request identifier.</param>
-      <param name="serverTime">The market data ready time.</param>
-      <param name="entries">Market data strings.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteMarketDataIncrementalRefresh(System.String,System.DateTimeOffset,System.Collections.Generic.ICollection{StockSharp.Fix.Native.MDEntry})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.MarketDataIncrementalRefresh" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="serverTime">The market data ready time.</param>
-      <param name="entries">Market data strings.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteMarketDataRequestReject(System.String,System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.MarketDataRequestReject" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="error">Error text description.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteNews(StockSharp.Messages.NewsMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.News" /> message (response).
-            </summary>
-      <param name="newsMsg">News.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteNewOrderSingle(StockSharp.Messages.OrderRegisterMessage,System.Action{StockSharp.Fix.Native.IFixWriter})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.NewOrderSingle" /> message (request).
-            </summary>
-      <param name="regMsg">Order registering message.</param>
-      <param name="condition">The handler for the order condition record.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderCancelReplaceRequest(StockSharp.Messages.OrderReplaceMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderCancelReplaceRequest" /> message (request).
-            </summary>
-      <param name="replaceMsg">Order changing message.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderCancelRequest(StockSharp.Messages.OrderCancelMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderCancelRequest" /> message (request).
-            </summary>
-      <param name="cancelMsg">Order cancelling message.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderMassCancelRequest(StockSharp.Messages.OrderGroupCancelMessage)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderMassCancelRequest" /> message (request).
-            </summary>
-      <param name="cancelMsg">Order group cancelling message.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteRequestForPositions(System.String,System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.RequestForPositions" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="account">Account number.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteCfhPortfolioRequest(System.String)">
-      <summary>
-            To record the CFH message about account information request (request).
-            </summary>
-      <param name="account">Account number.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderMassStatusRequest(System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderMassStatusRequest" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderStatusRequest(System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderStatusRequest" /> message (request).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteOrderCancelReject(System.String,System.String,System.String,System.DateTimeOffset)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.OrderCancelReject" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="orderId">Order ID.</param>
-      <param name="errorText">Error text.</param>
-      <param name="serverTime">Error time.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteExecutionReport(System.String,StockSharp.Messages.ExecutionMessage,System.Action{StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.ExecutionMessage})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.ExecutionReport" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="execMsg">Information about fulfilment.</param>
-      <param name="condition">The handler for the order condition record.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WritePositionReport(System.String,System.String,System.String,System.String,System.Nullable{StockSharp.Messages.SecurityTypes},System.Nullable{StockSharp.Messages.TPlusLimits},System.Nullable{StockSharp.Messages.CurrencyTypes},System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{StockSharp.Messages.PositionChangeTypes,System.Object}})">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.PositionReport" /> message (response).
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="account">Account number.</param>
-      <param name="symbol">Security code.</param>
-      <param name="securityExchange">Board code.</param>
-      <param name="securityType">Security type.</param>
-      <param name="limitType">T+ limit type.</param>
-      <param name="currency">Currency.</param>
-      <param name="changes">Change list.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.#ctor(StockSharp.Fix.Native.IFixWriter,StockSharp.Fix.FixVersions,StockSharp.Fix.FixFormats,Ecng.Common.IncrementalIdGenerator,System.String,System.String,System.String,System.String,System.String)">
-      <summary>
-            Initializes a new instance of the <see cref="T:StockSharp.Fix.Native.FixMessageWriter" />.
-            </summary>
-      <param name="writer">FIX protocol writer.</param>
-      <param name="version">Version FIX protocol.</param>
-      <param name="format">FIX protocol format.</param>
-      <param name="idGenerator">Transaction id generator.</param>
-      <param name="senderCompId">Sender ID.</param>
-      <param name="targetCompId">Target ID.</param>
-      <param name="dateFormat">Date format.</param>
-      <param name="dateTimeFormat">Date and time format.</param>
-      <param name="timeFormat">Time format.</param>
-    </member>
-    <member name="P:StockSharp.Fix.Native.FixMessageWriter.Writer">
-      <summary>
-            FIX protocol writer.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteLogonRequest(System.TimeSpan,System.Boolean,System.String,System.String)">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Logon" /> message (request).
-            </summary>
-      <param name="heartBeat">The interval of the connection availability check.</param>
-      <param name="isResetCounter">Should the number counter be cleared.</param>
-      <param name="userName">Login.</param>
-      <param name="password">Password.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteLogonResponse">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Logon" /> message (response).
-            </summary>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteLogoutRequest">
-      <summary>
-            To record the <see cref="F:StockSharp.Fix.Native.FixMessages.Logout" /> message (request).
-            </summary>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteHeartbeat(System.String)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.Heartbeat" />.
-            </summary>
-      <param name="requestId">Request identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteTestRequest(System.String)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.TestRequest" />.
-            </summary>
-      <param name="requestId">Request identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteSequenceReset(System.Boolean,System.Int64)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.SequenceReset" />.
-            </summary>
-      <param name="gapFill">Whether to fill gaps.</param>
-      <param name="number">The original message identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteResendRequest(System.Int32,System.Int32)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.ResendRequest" />.
-            </summary>
-      <param name="begin">The original message identifier.</param>
-      <param name="end">The last message identifier.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteChangePasswordRequest(StockSharp.Messages.ChangePasswordMessage,System.String,System.String)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.UserRequest" />.
-            </summary>
-      <param name="message">Change password message.</param>
-      <param name="userName">Login.</param>
-      <param name="password">Password.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteUserResponse(System.String,System.String,StockSharp.Fix.Native.UserStatus,System.String)">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.UserResponse" />.
-            </summary>
-      <param name="requestId">Request identifier.</param>
-      <param name="userName">User name.</param>
-      <param name="status">Status.</param>
-      <param name="text">Text message.</param>
-    </member>
-    <member name="M:StockSharp.Fix.Native.FixMessageWriter.WriteReject(System.String,System.Int32,System.String,System.Nullable{StockSharp.Fix.Native.FixTags},System.Nullable{System.Int32})">
-      <summary>
-            Write message <see cref="F:StockSharp.Fix.Native.FixMessages.Reject" />.
-            </summary>
-      <param name="error">Error info.</param>
-      <param name="seqNum">Message id.</param>
-      <param name="msgType">Message type.</param>
-      <param name="tag">Tag.</param>
-      <param name="sessionRejectReason">Error code.</param>
     </member>
     <member name="T:StockSharp.Fix.Native.FixTags">
       <summary>
@@ -3891,6 +4295,22 @@
       <summary>
       </summary>
     </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.PartyIDSource">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.PartyID">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.PartyRole">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.NoPartyIDs">
+      <summary>
+      </summary>
+    </member>
     <member name="F:StockSharp.Fix.Native.FixTags.CFICode">
       <summary>
       </summary>
@@ -4019,7 +4439,23 @@
       <summary>
       </summary>
     </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.NoTrdRegTimestamps">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.TrdRegTimestamp">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.TrdRegTimestampType">
+      <summary>
+      </summary>
+    </member>
     <member name="F:StockSharp.Fix.Native.FixTags.NextExpectedMsgSeqNum">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.OrdStatusReqID">
       <summary>
       </summary>
     </member>
@@ -4056,6 +4492,10 @@
       </summary>
     </member>
     <member name="F:StockSharp.Fix.Native.FixTags.UserStatusText">
+      <summary>
+      </summary>
+    </member>
+    <member name="F:StockSharp.Fix.Native.FixTags.MarketSegmentID">
       <summary>
       </summary>
     </member>
@@ -4228,6 +4668,56 @@
             To record an array of bytes.
             </summary>
       <param name="bytes">Bytes array.</param>
+    </member>
+    <member name="T:StockSharp.Fix.Native.MDEntry">
+      <summary>
+            The market data string.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.Type">
+      <summary>
+            Data type. Available types <see cref="T:StockSharp.Fix.Native.MDEntryType" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.Price">
+      <summary>
+            Price.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.Size">
+      <summary>
+            Volume.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.Action">
+      <summary>
+            Action. Available types <see cref="T:StockSharp.Fix.Native.MDUpdateAction" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.Position">
+      <summary>
+            Position.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.EntryId">
+      <summary>
+            Identifier.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.TickDirection">
+      <summary>
+            The tick direction.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.SecurityId">
+      <summary>
+            Security ID.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.Native.MDEntry.OtherValue">
+      <summary>
+            The additional string value.
+            </summary>
     </member>
     <member name="T:StockSharp.Fix.Native.TextFixReader">
       <summary>
@@ -4521,14 +5011,6 @@
             FIX message adapter.
             </summary>
     </member>
-    <member name="M:StockSharp.Fix.FixMessageAdapter.ProcessMarketDataMessage(System.String,StockSharp.Fix.Native.IFixReader)">
-      <summary>
-            The method is called when the received message is processing.
-            </summary>
-      <param name="msgType">FIX message type.</param>
-      <param name="reader">The reader of data recorded in the FIX protocol format.</param>
-      <returns>Whether the data was successfully processed.</returns>
-    </member>
     <member name="M:StockSharp.Fix.FixMessageAdapter.#ctor(Ecng.Common.IdGenerator)">
       <summary>
             Initializes a new instance of the <see cref="T:StockSharp.Fix.FixMessageAdapter" />.
@@ -4541,11 +5023,6 @@
             </summary>
       <returns>Order condition. If the connection does not support the order type <see cref="F:StockSharp.Messages.OrderTypes.Conditional" />, it will be returned <see langword="null" />.</returns>
     </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.IsSupportNativeSecurityLookup">
-      <summary>
-            Gets a value indicating whether the connector supports security lookup.
-            </summary>
-    </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.OrderStatusRequired">
       <summary>
         <see cref="T:StockSharp.Messages.OrderStatusMessage" /> required to get orders and ow trades.
@@ -4556,15 +5033,38 @@
         <see cref="T:StockSharp.Messages.SecurityLookupMessage" /> required to get securities.
             </summary>
     </member>
+    <member name="P:StockSharp.Fix.FixMessageAdapter.PortfolioLookupRequired">
+      <summary>
+        <see cref="T:StockSharp.Messages.PortfolioLookupMessage" /> required to get portfolios and positions.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.FixMessageAdapter.OrderCancelVolumeRequired">
+      <summary>
+        <see cref="P:StockSharp.Messages.OrderCancelMessage.Volume" /> required to cancel orders.
+            </summary>
+    </member>
     <member name="M:StockSharp.Fix.FixMessageAdapter.OnSendInMessage(StockSharp.Messages.Message)">
       <summary>
             Send message.
             </summary>
       <param name="message">Message.</param>
     </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.Version">
+    <member name="M:StockSharp.Fix.FixMessageAdapter.CreateDialect(System.IO.Stream,Ecng.Common.IncrementalIdGenerator)">
       <summary>
-            The FIX protocol version. The default is <see cref="F:StockSharp.Fix.FixVersions.Fix44" />.
+            Create FIX protocol dialect.
+            </summary>
+      <param name="stream">Stream.</param>
+      <param name="idGenerator">Sequence id generator.</param>
+      <returns>The dialect.</returns>
+    </member>
+    <member name="P:StockSharp.Fix.FixMessageAdapter.Address">
+      <summary>
+            Server address.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Fix.FixMessageAdapter.Dialect">
+      <summary>
+            The FIX dialect. The default is <see cref="F:StockSharp.Fix.FixDialects.Default" />.
             </summary>
     </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.SenderCompId">
@@ -4587,21 +5087,6 @@
             Password.
             </summary>
     </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.Address">
-      <summary>
-            Server address.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.MarketData">
-      <summary>
-            Market data type.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.ExchangeBoard">
-      <summary>
-            Board, where securities are traded.
-            </summary>
-    </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.RequestAllPortfolios">
       <summary>
             Request all portfolios on start.
@@ -4612,49 +5097,19 @@
             Request all securities on connection.
             </summary>
     </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.Encoding">
-      <summary>
-            The encoding used for data transmission. The default value is <see cref="P:System.Text.Encoding.UTF8" />.
-            </summary>
-    </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.IsResetCounter">
       <summary>
             Should the number counter be cleared. The default is enabled.
             </summary>
     </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.Format">
-      <summary>
-            FIX protocol format.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.TimeZone">
-      <summary>
-            Information about the time zone where the exchange is located.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.DateFormat">
-      <summary>
-            Date format.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.DateTimeFormat">
-      <summary>
-            Date and time format.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixMessageAdapter.TimeFormat">
-      <summary>
-            Time format.
-            </summary>
-    </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.ReadTimeout">
       <summary>
-            The timeout of getting data from the server. The default value is <see cref="F:Ecng.Common.SyncObject.InfiniteTimeSpan" />.
+            The timeout of getting data from the server. The default value is <see cref="F:System.TimeSpan.Zero" />.
             </summary>
     </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.WriteTimeout">
       <summary>
-            The timeout of sending data to the server. The default value is <see cref="F:Ecng.Common.SyncObject.InfiniteTimeSpan" />.
+            The timeout of sending data to the server. The default value is <see cref="F:System.TimeSpan.Zero" />.
             </summary>
     </member>
     <member name="P:StockSharp.Fix.FixMessageAdapter.IsValid">
@@ -4680,37 +5135,6 @@
             </summary>
       <returns>A string that represents the current object.</returns>
     </member>
-    <member name="M:StockSharp.Fix.FixMessageAdapter.ReadOrderCondition(StockSharp.Fix.Native.IFixReader,StockSharp.Fix.Native.FixTags,System.Func{StockSharp.Messages.OrderCondition})">
-      <summary>
-            To read the order registration condition <see cref="P:StockSharp.Messages.OrderRegisterMessage.Condition" />.
-            </summary>
-      <param name="reader">Data reader.</param>
-      <param name="tag">Tag.</param>
-      <param name="getCondition">The function returning the order condition.</param>
-      <returns>Whether the data was successfully processed.</returns>
-    </member>
-    <member name="M:StockSharp.Fix.FixMessageAdapter.PostInitCondition(System.Char,StockSharp.Messages.OrderCondition)">
-      <summary>
-            The final initialization of the order condition.
-            </summary>
-      <param name="ordType">Order type.</param>
-      <param name="condition">The order condition.</param>
-    </member>
-    <member name="M:StockSharp.Fix.FixMessageAdapter.ProcessTransactionMessage(System.String,StockSharp.Fix.Native.IFixReader)">
-      <summary>
-            The method is called when the received message is processing.
-            </summary>
-      <param name="msgType">FIX message type.</param>
-      <param name="reader">The reader of data recorded in the FIX protocol format.</param>
-      <returns>Whether the data was successfully processed.</returns>
-    </member>
-    <member name="M:StockSharp.Fix.FixMessageAdapter.WriteOrderCondition(StockSharp.Fix.Native.IFixWriter,StockSharp.Messages.OrderRegisterMessage)">
-      <summary>
-            To record data by the order condition.
-            </summary>
-      <param name="writer">FIX data writer.</param>
-      <param name="regMsg">The message containing the information for the order registration.</param>
-    </member>
     <member name="T:StockSharp.Fix.FixClientRoles">
       <summary>
             Roles.
@@ -4726,84 +5150,39 @@
             Administrative connection.
             </summary>
     </member>
-    <member name="T:StockSharp.Fix.FixMarketData">
+    <member name="T:StockSharp.Fix.FixDialects">
       <summary>
-            Market-data types.
+            Dialects of the FIX protocol.
             </summary>
     </member>
-    <member name="F:StockSharp.Fix.FixMarketData.None">
+    <member name="F:StockSharp.Fix.FixDialects.Default">
       <summary>
-            None.
+            Default.
             </summary>
     </member>
-    <member name="F:StockSharp.Fix.FixMarketData.Quote">
+    <member name="F:StockSharp.Fix.FixDialects.CFH">
       <summary>
-            Quotes.
+            CFH.
             </summary>
     </member>
-    <member name="F:StockSharp.Fix.FixMarketData.MarketData">
+    <member name="F:StockSharp.Fix.FixDialects.ASTS">
       <summary>
-            Full depth.
+            ASTS.
             </summary>
     </member>
-    <member name="T:StockSharp.Fix.FixVersions">
+    <member name="F:StockSharp.Fix.FixDialects.Spectra">
       <summary>
-            FIX protocol versions.
+            Spectra.
             </summary>
     </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix40">
+    <member name="F:StockSharp.Fix.FixDialects.Otkritie">
       <summary>
-            FIX 4.0.
+            Otkritie.
             </summary>
     </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix41">
+    <member name="F:StockSharp.Fix.FixDialects.QuikServer">
       <summary>
-            FIX 4.1.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix42">
-      <summary>
-            FIX 4.2.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix43">
-      <summary>
-            FIX 4.3.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix44">
-      <summary>
-            FIX 4.4.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix44_CFH">
-      <summary>
-            FIX 4.4 (CFH Clearing).
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix44_Micex">
-      <summary>
-            FIX 4.4 (Micex).
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix44_Lua">
-      <summary>
-            FIX 4.4 (LUA).
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix50">
-      <summary>
-            FIX 5.0.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix50Sp1">
-      <summary>
-            FIX 5.0 SP1.
-            </summary>
-    </member>
-    <member name="F:StockSharp.Fix.FixVersions.Fix50Sp2">
-      <summary>
-            FIX 5.0 SP2.
+            Quik (server).
             </summary>
     </member>
     <member name="T:StockSharp.Fix.FixTrader">
@@ -4815,42 +5194,6 @@
       <summary>
             Initializes a new instance of the <see cref="T:StockSharp.Fix.FixTrader" />.
             </summary>
-    </member>
-    <member name="P:StockSharp.Fix.FixTrader.TransactionCopyAdapter">
-      <summary>
-            Transactional session (copy, used with MICEX to receive orders and trades, registered for connections).
-            </summary>
-    </member>
-    <member name="M:StockSharp.Fix.FixTrader.OnCancelOrder(StockSharp.BusinessEntities.Order,System.Int64)">
-      <summary>
-            Cancel the order.
-            </summary>
-      <param name="order">Order to cancel.</param>
-      <param name="transactionId">Order cancellation transaction id.</param>
-    </member>
-    <member name="M:StockSharp.Fix.FixTrader.OnCancelOrders(System.Int64,System.Nullable{System.Boolean},StockSharp.BusinessEntities.Portfolio,System.Nullable{StockSharp.Messages.Sides},StockSharp.BusinessEntities.ExchangeBoard,StockSharp.BusinessEntities.Security)">
-      <summary>
-            Cancel orders by filter.
-            </summary>
-      <param name="transactionId">Order cancellation transaction id.</param>
-      <param name="isStopOrder">
-        <see langword="true" />, if cancel only a stop orders, <see langword="false" /> - if regular orders, <see langword="null" /> - both.</param>
-      <param name="portfolio">Portfolio. If the value is equal to <see langword="null" />, then the portfolio does not match the orders cancel filter.</param>
-      <param name="direction">Order side. If the value is <see langword="null" />, the direction does not use.</param>
-      <param name="board">Trading board. If the value is equal to <see langword="null" />, then the board does not match the orders cancel filter.</param>
-      <param name="security">Instrument. If the value is equal to <see langword="null" />, then the instrument does not match the orders cancel filter.</param>
-    </member>
-    <member name="M:StockSharp.Fix.FixTrader.ChangePassword(System.String)">
-      <summary>
-            Change password.
-            </summary>
-      <param name="newPassword">New password.</param>
-    </member>
-    <member name="M:StockSharp.Fix.FixTrader.OnProcessMessage(StockSharp.Messages.Message)">
-      <summary>
-            Process message.
-            </summary>
-      <param name="message">Message.</param>
     </member>
     <member name="T:StockSharp.Fix.FixStopOrderType">
       <summary>

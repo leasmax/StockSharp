@@ -174,12 +174,12 @@ namespace StockSharp.Algo.Storages
 				_quoteSerializer.Serialize(stream, list, metaInfo);
 			}
 
-			public override IEnumerableEx<QuoteChangeMessage> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
+			public override IEnumerable<QuoteChangeMessage> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
 			{
-				return new QuoteEnumerable(_quoteSerializer.Deserialize(stream, metaInfo), SecurityId).ToEx(metaInfo.Count);
+				return new QuoteEnumerable(_quoteSerializer.Deserialize(stream, metaInfo), SecurityId);
 			}
 
-			protected override void Write(TextWriter writer, QuoteChangeMessage data)
+			protected override void Write(CsvFileWriter writer, QuoteChangeMessage data)
 			{
 				throw new NotSupportedException();
 			}
@@ -203,9 +203,9 @@ namespace StockSharp.Algo.Storages
 				get { throw new NotSupportedException(); }
 			}
 
-			void IMarketDataStorage<TEntity>.Save(IEnumerable<TEntity> data)
+			int IMarketDataStorage<TEntity>.Save(IEnumerable<TEntity> data)
 			{
-				Save(data.Select(ToMessage));
+				return Save(data.Select(ToMessage));
 			}
 
 			void IMarketDataStorage<TEntity>.Delete(IEnumerable<TEntity> data)
@@ -213,7 +213,7 @@ namespace StockSharp.Algo.Storages
 				Delete(data.Select(ToMessage));
 			}
 
-			IEnumerableEx<TEntity> IMarketDataStorage<TEntity>.Load(DateTime date)
+			IEnumerable<TEntity> IMarketDataStorage<TEntity>.Load(DateTime date)
 			{
 				return Load(date).ToEntities<TMessage, TEntity>(Security);
 			}
@@ -311,7 +311,7 @@ namespace StockSharp.Algo.Storages
 			{
 			}
 
-			IEnumerableEx<CandleMessage> IMarketDataStorage<CandleMessage>.Load(DateTime date)
+			IEnumerable<CandleMessage> IMarketDataStorage<CandleMessage>.Load(DateTime date)
 			{
 				return Load(date);
 			}
@@ -321,9 +321,9 @@ namespace StockSharp.Algo.Storages
 				get { throw new NotSupportedException(); }
 			}
 
-			void IMarketDataStorage<CandleMessage>.Save(IEnumerable<CandleMessage> data)
+			int IMarketDataStorage<CandleMessage>.Save(IEnumerable<CandleMessage> data)
 			{
-				Save(data.Cast<TCandleMessage>());
+				return Save(data.Cast<TCandleMessage>());
 			}
 
 			void IMarketDataStorage<CandleMessage>.Delete(IEnumerable<CandleMessage> data)
@@ -349,9 +349,9 @@ namespace StockSharp.Algo.Storages
 			{
 			}
 
-			void IMarketDataStorage<TCandle>.Save(IEnumerable<TCandle> data)
+			int IMarketDataStorage<TCandle>.Save(IEnumerable<TCandle> data)
 			{
-				Save(data.Select(Convert));
+				return Save(data.Select(Convert));
 			}
 
 			void IMarketDataStorage<TCandle>.Delete(IEnumerable<TCandle> data)
@@ -359,13 +359,12 @@ namespace StockSharp.Algo.Storages
 				Delete(data.Select(Convert));
 			}
 
-			IEnumerableEx<TCandle> IMarketDataStorage<TCandle>.Load(DateTime date)
+			IEnumerable<TCandle> IMarketDataStorage<TCandle>.Load(DateTime date)
 			{
 				var messages = Load(date);
 
 				return messages
-					.ToCandles<TCandle>(Security)
-					.ToEx(messages.Count);
+					.ToCandles<TCandle>(Security);
 			}
 
 			IMarketDataSerializer<TCandle> IMarketDataStorage<TCandle>.Serializer
@@ -402,9 +401,9 @@ namespace StockSharp.Algo.Storages
 				get { throw new NotSupportedException(); }
 			}
 
-			void IMarketDataStorage<Candle>.Save(IEnumerable<Candle> data)
+			int IMarketDataStorage<Candle>.Save(IEnumerable<Candle> data)
 			{
-				Save(data.Select(c => Convert((TCandle)c)));
+				return Save(data.Select(c => Convert((TCandle)c)));
 			}
 
 			void IMarketDataStorage<Candle>.Delete(IEnumerable<Candle> data)
@@ -412,13 +411,12 @@ namespace StockSharp.Algo.Storages
 				Delete(data.Select(c => Convert((TCandle)c)));
 			}
 
-			IEnumerableEx<Candle> IMarketDataStorage<Candle>.Load(DateTime date)
+			IEnumerable<Candle> IMarketDataStorage<Candle>.Load(DateTime date)
 			{
 				var messages = Load(date);
 
 				return messages
-					.ToCandles<Candle>(Security, typeof(TCandleMessage).ToCandleType())
-					.ToEx(messages.Count);
+					.ToCandles<Candle>(Security, typeof(TCandleMessage).ToCandleType());
 			}
 
 			DateTimeOffset IMarketDataStorageInfo<Candle>.GetTime(Candle data)
@@ -439,7 +437,7 @@ namespace StockSharp.Algo.Storages
 			IMarketDataStorageInfo<Order>, IMarketDataStorage<MyTrade>, IMarketDataStorageInfo<MyTrade>
 		{
 			public TransactionStorage(Security security, IMarketDataStorageDrive drive, IMarketDataSerializer<ExecutionMessage> serializer)
-				: base(security, ExecutionTypes.Order, msg => msg.ServerTime, msg => msg.SecurityId, msg => msg.TransactionId, serializer, drive)
+				: base(security, ExecutionTypes.Transaction, msg => msg.ServerTime, msg => msg.SecurityId, msg => msg.TransactionId, serializer, drive)
 			{
 				AppendOnlyNew = false;
 			}
@@ -451,9 +449,9 @@ namespace StockSharp.Algo.Storages
 				get { throw new NotSupportedException(); }
 			}
 
-			void IMarketDataStorage<Order>.Save(IEnumerable<Order> data)
+			int IMarketDataStorage<Order>.Save(IEnumerable<Order> data)
 			{
-				Save(data.Select(t => t.ToMessage()));
+				return Save(data.Select(t => t.ToMessage()));
 			}
 
 			void IMarketDataStorage<Order>.Delete(IEnumerable<Order> data)
@@ -461,7 +459,7 @@ namespace StockSharp.Algo.Storages
 				throw new NotSupportedException();
 			}
 
-			IEnumerableEx<Order> IMarketDataStorage<Order>.Load(DateTime date)
+			IEnumerable<Order> IMarketDataStorage<Order>.Load(DateTime date)
 			{
 				throw new NotSupportedException();
 			}
@@ -480,9 +478,9 @@ namespace StockSharp.Algo.Storages
 				get { throw new NotSupportedException(); }
 			}
 
-			void IMarketDataStorage<MyTrade>.Save(IEnumerable<MyTrade> data)
+			int IMarketDataStorage<MyTrade>.Save(IEnumerable<MyTrade> data)
 			{
-				Save(data.Select(t => t.ToMessage()));
+				return Save(data.Select(t => t.ToMessage()));
 			}
 
 			void IMarketDataStorage<MyTrade>.Delete(IEnumerable<MyTrade> data)
@@ -490,7 +488,7 @@ namespace StockSharp.Algo.Storages
 				throw new NotSupportedException();
 			}
 
-			IEnumerableEx<MyTrade> IMarketDataStorage<MyTrade>.Load(DateTime date)
+			IEnumerable<MyTrade> IMarketDataStorage<MyTrade>.Load(DateTime date)
 			{
 				throw new NotSupportedException();
 			}
@@ -730,7 +728,7 @@ namespace StockSharp.Algo.Storages
 		/// <returns>The storage of tick trades.</returns>
 		public IMarketDataStorage<ExecutionMessage> GetTickMessageStorage(Security security, IMarketDataDrive drive = null, StorageFormats format = StorageFormats.Binary)
 		{
-			return GetExecutionStorage(security, ExecutionTypes.Tick, drive, format);
+			return GetExecutionMessageStorage(security, ExecutionTypes.Tick, drive, format);
 		}
 
 		/// <summary>
@@ -785,7 +783,19 @@ namespace StockSharp.Algo.Storages
 		/// <returns>The storage of orders log.</returns>
 		public IMarketDataStorage<ExecutionMessage> GetOrderLogMessageStorage(Security security, IMarketDataDrive drive = null, StorageFormats format = StorageFormats.Binary)
 		{
-			return GetExecutionStorage(security, ExecutionTypes.OrderLog, drive, format);
+			return GetExecutionMessageStorage(security, ExecutionTypes.OrderLog, drive, format);
+		}
+
+		/// <summary>
+		/// To get the transactions storage the specified instrument.
+		/// </summary>
+		/// <param name="security">Security.</param>
+		/// <param name="drive">The storage. If a value is <see langword="null" />, <see cref="IStorageRegistry.DefaultDrive"/> will be used.</param>
+		/// <param name="format">The format type. By default <see cref="StorageFormats.Binary"/> is passed.</param>
+		/// <returns>The transactions storage.</returns>
+		public IMarketDataStorage<ExecutionMessage> GetTransactionStorage(Security security, IMarketDataDrive drive = null, StorageFormats format = StorageFormats.Binary)
+		{
+			return GetExecutionMessageStorage(security, ExecutionTypes.Transaction, drive, format);
 		}
 
 		/// <summary>
@@ -888,14 +898,14 @@ namespace StockSharp.Algo.Storages
 		}
 
 		/// <summary>
-		/// To get the execution storage the specified instrument.
+		/// To get the <see cref="ExecutionMessage"/> storage the specified instrument.
 		/// </summary>
 		/// <param name="security">Security.</param>
 		/// <param name="type">Data type, information about which is contained in the <see cref="ExecutionMessage"/>.</param>
 		/// <param name="drive">The storage. If a value is <see langword="null" />, <see cref="IStorageRegistry.DefaultDrive"/> will be used.</param>
 		/// <param name="format">The format type. By default <see cref="StorageFormats.Binary"/> is passed.</param>
-		/// <returns>The transactions storage.</returns>
-		public IMarketDataStorage<ExecutionMessage> GetExecutionStorage(Security security, ExecutionTypes type, IMarketDataDrive drive = null, StorageFormats format = StorageFormats.Binary)
+		/// <returns>The <see cref="ExecutionMessage"/> storage.</returns>
+		public IMarketDataStorage<ExecutionMessage> GetExecutionMessageStorage(Security security, ExecutionTypes type, IMarketDataDrive drive = null, StorageFormats format = StorageFormats.Binary)
 		{
 			if (security == null)
 				throw new ArgumentNullException(nameof(security));
@@ -912,11 +922,11 @@ namespace StockSharp.Algo.Storages
 					case ExecutionTypes.Tick:
 					{
 						if (security is ContinuousSecurity)
-							return new ConvertableContinuousSecurityMarketDataStorage<ExecutionMessage, Trade>((ContinuousSecurity)security, null, t => t.ServerTime, t => ToSecurity(t.SecurityId), t => t.ToMessage(), t => t.Time, (s, d) => GetExecutionStorage(s, type, d, format), mdDrive);
+							return new ConvertableContinuousSecurityMarketDataStorage<ExecutionMessage, Trade>((ContinuousSecurity)security, null, t => t.ServerTime, t => ToSecurity(t.SecurityId), t => t.ToMessage(), t => t.Time, (s, d) => GetExecutionMessageStorage(s, type, d, format), mdDrive);
 						else if (security is IndexSecurity)
-							return new IndexSecurityMarketDataStorage<ExecutionMessage>((IndexSecurity)security, null, d => ToSecurity(d.SecurityId), (s, d) => GetExecutionStorage(s, type, d, format), mdDrive);
+							return new IndexSecurityMarketDataStorage<ExecutionMessage>((IndexSecurity)security, null, d => ToSecurity(d.SecurityId), (s, d) => GetExecutionMessageStorage(s, type, d, format), mdDrive);
 						else if (security.Board == ExchangeBoard.Associated)
-							return new ConvertableAllSecurityMarketDataStorage<ExecutionMessage, Trade>(security, null, t => t.ServerTime, t => ToSecurity(t.SecurityId), t => t.Time, (s, d) => GetExecutionStorage(s, type, d, format), mdDrive);
+							return new ConvertableAllSecurityMarketDataStorage<ExecutionMessage, Trade>(security, null, t => t.ServerTime, t => ToSecurity(t.SecurityId), t => t.Time, (s, d) => GetExecutionMessageStorage(s, type, d, format), mdDrive);
 						else
 						{
 							IMarketDataSerializer<ExecutionMessage> serializer;
@@ -936,8 +946,7 @@ namespace StockSharp.Algo.Storages
 							return new TradeStorage(security, mdDrive, serializer);
 						}
 					}
-					case ExecutionTypes.Order:
-					case ExecutionTypes.Trade:
+					case ExecutionTypes.Transaction:
 					{
 						IMarketDataSerializer<ExecutionMessage> serializer;
 
@@ -997,7 +1006,7 @@ namespace StockSharp.Algo.Storages
 				dataType = dataType.ToMessageType(ref arg);
 
 			if (dataType == typeof(ExecutionMessage))
-				return GetExecutionStorage(security, (ExecutionTypes)arg, drive, format);
+				return GetExecutionMessageStorage(security, (ExecutionTypes)arg, drive, format);
 			else if (dataType == typeof(Level1ChangeMessage))
 				return GetLevel1MessageStorage(security, drive, format);
 			else if (dataType == typeof(QuoteChangeMessage))
@@ -1142,7 +1151,7 @@ namespace StockSharp.Algo.Storages
 						file.WriteLine(_format.PutEx(security));
 				});
 
-				Added.SafeInvoke(new[] { security });
+				Added?.Invoke(new[] { security });
 			}
 
 			void ISecurityStorage.Delete(Security security)
@@ -1151,7 +1160,7 @@ namespace StockSharp.Algo.Storages
 					return;
 
 				Save();
-				Removed.SafeInvoke(new[] { security });
+				Removed?.Invoke(new[] { security });
 			}
 
 			void ISecurityStorage.DeleteBy(Security criteria)
@@ -1164,7 +1173,7 @@ namespace StockSharp.Algo.Storages
 						removed.Add(security);
 				}
 
-				Removed.SafeInvoke(removed);
+				Removed?.Invoke(removed);
 				
 				Save();
 			}

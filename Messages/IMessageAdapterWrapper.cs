@@ -58,6 +58,11 @@ namespace StockSharp.Messages
 		public IMessageAdapter InnerAdapter { get; }
 
 		/// <summary>
+		/// Control <see cref="InnerAdapter"/> lifetime.
+		/// </summary>
+		public bool OwnInnerAdaper { get; set; }
+
+		/// <summary>
 		/// Process <see cref="InnerAdapter"/> output message.
 		/// </summary>
 		/// <param name="message">The message.</param>
@@ -72,7 +77,7 @@ namespace StockSharp.Messages
 		/// <param name="message">The message.</param>
 		protected void RaiseNewOutMessage(Message message)
 		{
-			NewOutMessage.SafeInvoke(message);
+			NewOutMessage?.Invoke(message);
 		}
 
 		bool IMessageChannel.IsOpened => InnerAdapter.IsOpened;
@@ -168,6 +173,8 @@ namespace StockSharp.Messages
 
 		bool IMessageAdapter.OrderStatusRequired => InnerAdapter.OrderStatusRequired;
 
+		bool IMessageAdapter.OrderCancelVolumeRequired => InnerAdapter.OrderCancelVolumeRequired;
+
 		string IMessageAdapter.AssociatedBoardCode => InnerAdapter.AssociatedBoardCode;
 
 		OrderCondition IMessageAdapter.CreateOrderCondition()
@@ -191,7 +198,9 @@ namespace StockSharp.Messages
 		public virtual void Dispose()
 		{
 			InnerAdapter.NewOutMessage -= OnInnerAdapterNewOutMessage;
-			//InnerAdapter.Dispose();
+
+			if (OwnInnerAdaper)
+				InnerAdapter.Dispose();
 		}
 	}
 }

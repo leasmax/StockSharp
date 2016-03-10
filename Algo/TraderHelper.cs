@@ -84,8 +84,8 @@ namespace StockSharp.Algo
 
 			AddRange(securities);
 
-			AddedRange += s => _added.SafeInvoke(s);
-			RemovedRange += s => _removed.SafeInvoke(s);
+			AddedRange += s => _added?.Invoke(s);
+			RemovedRange += s => _removed?.Invoke(s);
 		}
 
 		private Action<IEnumerable<Security>> _added;
@@ -131,6 +131,60 @@ namespace StockSharp.Algo
 	/// </summary>
 	public static class TraderHelper
 	{
+		private static readonly bool[][] _stateChangePossibilities;
+
+		static TraderHelper()
+		{
+			_stateChangePossibilities = new bool[5][];
+
+			for (var i = 0; i < _stateChangePossibilities.Length; i++)
+				_stateChangePossibilities[i] = new bool[_stateChangePossibilities.Length];
+
+			_stateChangePossibilities[(int)OrderStates.None][(int)OrderStates.None] = true;
+			_stateChangePossibilities[(int)OrderStates.None][(int)OrderStates.Pending] = true;
+			_stateChangePossibilities[(int)OrderStates.None][(int)OrderStates.Active] = true;
+			_stateChangePossibilities[(int)OrderStates.None][(int)OrderStates.Done] = true;
+			_stateChangePossibilities[(int)OrderStates.None][(int)OrderStates.Failed] = true;
+
+			_stateChangePossibilities[(int)OrderStates.Pending][(int)OrderStates.None] = false;
+			_stateChangePossibilities[(int)OrderStates.Pending][(int)OrderStates.Pending] = true;
+			_stateChangePossibilities[(int)OrderStates.Pending][(int)OrderStates.Active] = true;
+			_stateChangePossibilities[(int)OrderStates.Pending][(int)OrderStates.Done] = true;
+			_stateChangePossibilities[(int)OrderStates.Pending][(int)OrderStates.Failed] = true;
+
+			_stateChangePossibilities[(int)OrderStates.Active][(int)OrderStates.None] = false;
+			_stateChangePossibilities[(int)OrderStates.Active][(int)OrderStates.Pending] = false;
+			_stateChangePossibilities[(int)OrderStates.Active][(int)OrderStates.Active] = true;
+			_stateChangePossibilities[(int)OrderStates.Active][(int)OrderStates.Done] = true;
+			_stateChangePossibilities[(int)OrderStates.Active][(int)OrderStates.Failed] = false;
+
+			_stateChangePossibilities[(int)OrderStates.Done][(int)OrderStates.None] = false;
+			_stateChangePossibilities[(int)OrderStates.Done][(int)OrderStates.Pending] = false;
+			_stateChangePossibilities[(int)OrderStates.Done][(int)OrderStates.Active] = false;
+			_stateChangePossibilities[(int)OrderStates.Done][(int)OrderStates.Done] = true;
+			_stateChangePossibilities[(int)OrderStates.Done][(int)OrderStates.Failed] = false;
+
+			_stateChangePossibilities[(int)OrderStates.Failed][(int)OrderStates.None] = false;
+			_stateChangePossibilities[(int)OrderStates.Failed][(int)OrderStates.Pending] = false;
+			_stateChangePossibilities[(int)OrderStates.Failed][(int)OrderStates.Active] = false;
+			_stateChangePossibilities[(int)OrderStates.Failed][(int)OrderStates.Done] = false;
+			_stateChangePossibilities[(int)OrderStates.Failed][(int)OrderStates.Failed] = true;
+		}
+
+		/// <summary>
+		/// Chech the possibility order's state change.
+		/// </summary>
+		/// <param name="prev">Previous order's state.</param>
+		/// <param name="curr">Current order's state.</param>
+		/// <returns>The current order's state.</returns>
+		public static OrderStates CheckModification(this OrderStates prev, OrderStates curr)
+		{
+			if (!_stateChangePossibilities[(int)prev][(int)curr])
+				throw new ArgumentException("message");
+
+			return curr;
+		}
+
 		/// <summary>
 		/// To filter the order book from own orders.
 		/// </summary>
@@ -265,7 +319,7 @@ namespace StockSharp.Algo
 			}
 
 			var pair = depth.BestPair;
-			return pair == null ? null : pair.GetCurrentPrice(side, priceType);
+			return pair?.GetCurrentPrice(side, priceType);
 		}
 
 		/// <summary>
@@ -290,13 +344,13 @@ namespace StockSharp.Algo
 				case MarketPriceTypes.Opposite:
 				{
 					var quote = (side == Sides.Buy ? bestPair.Ask : bestPair.Bid);
-					currentPrice = quote == null ? (decimal?)null : quote.Price;
+					currentPrice = quote?.Price;
 					break;
 				}
 				case MarketPriceTypes.Following:
 				{
 					var quote = (side == Sides.Buy ? bestPair.Bid : bestPair.Ask);
-					currentPrice = quote == null ? (decimal?)null : quote.Price;
+					currentPrice = quote?.Price;
 					break;
 				}
 				case MarketPriceTypes.Middle:
@@ -387,14 +441,14 @@ namespace StockSharp.Algo
 		/// <summary>
 		/// To get the position on My trade.
 		/// </summary>
-		/// <param name="message">My trade, used for position calculation. At buy the trade volume <see cref="ExecutionMessage.Volume"/> is taken with positive sign, at sell - with negative.</param>
+		/// <param name="message">My trade, used for position calculation. At buy the trade volume <see cref="ExecutionMessage.TradeVolume"/> is taken with positive sign, at sell - with negative.</param>
 		/// <returns>Position.</returns>
 		public static decimal GetPosition(this ExecutionMessage message)
 		{
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
-			return (message.Side == Sides.Buy ? message.Volume : -message.Volume) ?? 0;
+			return (message.Side == Sides.Buy ? message.TradeVolume : -message.TradeVolume) ?? 0;
 		}
 
 		/// <summary>
@@ -704,7 +758,13 @@ namespace StockSharp.Algo
 				Security = oldOrder.Security,
 				Type = oldOrder.Type,
 				Price = newPrice ?? oldOrder.Price,
-				Volume = newVolume ?? oldOrder.Volume
+				Volume = newVolume ?? oldOrder.Volume,
+				ExpiryDate = oldOrder.ExpiryDate,
+				VisibleVolume = oldOrder.VisibleVolume,
+				BrokerCode = oldOrder.BrokerCode,
+				ClientCode = oldOrder.ClientCode,
+				RepoInfo = oldOrder.RepoInfo?.Clone(),
+				RpsInfo = oldOrder.RpsInfo?.Clone(),
 			};
 		}
 
@@ -1374,7 +1434,7 @@ namespace StockSharp.Algo
 			if (order == null)
 				throw new ArgumentNullException(nameof(order));
 
-			return order.Balance > 0 && order.Balance != order.Volume;
+			return order.Balance > 0 && order.Balance != order.OrderVolume;
 		}
 
 		/// <summary>
@@ -1387,7 +1447,7 @@ namespace StockSharp.Algo
 			if (order == null)
 				throw new ArgumentNullException(nameof(order));
 
-			return order.Balance > 0 && order.Balance == order.Volume;
+			return order.Balance > 0 && order.Balance == order.OrderVolume;
 		}
 
 		/// <summary>
@@ -1524,23 +1584,16 @@ namespace StockSharp.Algo
 					if (execMsg == null)
 						return;
 
-					switch (execMsg.ExecutionType)
+					if (execMsg.Error != null)
+						errors.Add(execMsg.Error);
+
+					if (execMsg.HasTradeInfo())
 					{
-						case ExecutionTypes.Order:
-							if (execMsg.Error != null)
-								errors.Add(execMsg.Error);
-
-							break;
-						case ExecutionTypes.Trade:
+						trades.Add(new MyTrade
 						{
-							trades.Add(new MyTrade
-							{
-								Order = order,
-								Trade = execMsg.ToTrade(new Trade { Security = order.Security })
-							});
-
-							break;
-						}
+							Order = order,
+							Trade = execMsg.ToTrade(new Trade { Security = order.Security })
+						});
 					}
 				};
 
@@ -1693,7 +1746,7 @@ namespace StockSharp.Algo
 				throw new ArgumentNullException(nameof(security));
 
 			var basket = security as BasketSecurity;
-			return basket == null ? orders.Where(o => o.Security == security) : basket.InnerSecurities.SelectMany(s => Filter(orders, s));
+			return basket?.InnerSecurities.SelectMany(s => Filter(orders, s)) ?? orders.Where(o => o.Security == security);
 		}
 
 		/// <summary>
@@ -1756,7 +1809,7 @@ namespace StockSharp.Algo
 				throw new ArgumentNullException(nameof(security));
 
 			var basket = security as BasketSecurity;
-			return basket == null ? trades.Where(t => t.Security == security) : basket.InnerSecurities.SelectMany(s => Filter(trades, s));
+			return basket?.InnerSecurities.SelectMany(s => Filter(trades, s)) ?? trades.Where(t => t.Security == security);
 		}
 
 		/// <summary>
@@ -1789,7 +1842,7 @@ namespace StockSharp.Algo
 				throw new ArgumentNullException(nameof(security));
 
 			var basket = security as BasketSecurity;
-			return basket == null ? positions.Where(p => p.Security == security) : basket.InnerSecurities.SelectMany(s => Filter(positions, s));
+			return basket?.InnerSecurities.SelectMany(s => Filter(positions, s)) ?? positions.Where(p => p.Security == security);
 		}
 
 		/// <summary>
@@ -3262,7 +3315,7 @@ namespace StockSharp.Algo
 		public static Tuple<SecurityTypes?, string> GetSecurityClassInfo(this IDictionary<string, RefPair<SecurityTypes, string>> securityClassInfo, string secClass)
 		{
 			var pair = securityClassInfo.TryGetValue(secClass);
-			return Tuple.Create(pair == null ? (SecurityTypes?)null : pair.First, pair == null ? secClass : pair.Second);
+			return Tuple.Create(pair?.First, pair == null ? secClass : pair.Second);
 		}
 
 		/// <summary>
@@ -3367,7 +3420,7 @@ namespace StockSharp.Algo
 		/// <returns>Directory name.</returns>
 		public static string CandleArgToFolderName(object arg)
 		{
-			return arg == null ? string.Empty : arg.ToString().Replace(":", "-");
+			return arg?.ToString().Replace(":", "-") ?? string.Empty;
 		}
 
 		/// <summary>
@@ -3563,14 +3616,14 @@ namespace StockSharp.Algo
 		/// </summary>
 		/// <param name="security">Security.</param>
 		/// <returns>Type in ISO 10962 standard.</returns>
-		public static string GetIso10962(this Security security)
+		public static string Iso10962(this SecurityMessage security)
 		{
 			if (security == null)
 				throw new ArgumentNullException(nameof(security));
 
 			// https://en.wikipedia.org/wiki/ISO_10962
 
-			switch (security.Type)
+			switch (security.SecurityType)
 			{
 				case SecurityTypes.Stock:
 					return "ESXXXX";
@@ -3626,17 +3679,17 @@ namespace StockSharp.Algo
 		/// <summary>
 		/// To convert the type in the ISO 10962 standard into <see cref="SecurityTypes"/>.
 		/// </summary>
-		/// <param name="type">Type in ISO 10962 standard.</param>
+		/// <param name="cfi">Type in ISO 10962 standard.</param>
 		/// <returns>Security type.</returns>
-		public static SecurityTypes? FromIso10962(string type)
+		public static SecurityTypes? Iso10962ToSecurityType(this string cfi)
 		{
-			if (type.IsEmpty())
-				throw new ArgumentNullException(nameof(type));
+			if (cfi.IsEmpty())
+				throw new ArgumentNullException(nameof(cfi));
 
-			if (type.Length != 6)
-				throw new ArgumentOutOfRangeException(nameof(type), type, LocalizedStrings.Str2117);
+			if (cfi.Length != 6)
+				throw new ArgumentOutOfRangeException(nameof(cfi), cfi, LocalizedStrings.Str2117);
 
-			switch (type[0])
+			switch (cfi[0])
 			{
 				case 'E':
 					return SecurityTypes.Stock;
@@ -3652,7 +3705,7 @@ namespace StockSharp.Algo
 
 				case 'F':
 				{
-					switch (type[2])
+					switch (cfi[2])
 					{
 						case 'W':
 							return SecurityTypes.Swap;
@@ -3667,11 +3720,11 @@ namespace StockSharp.Algo
 
 				case 'M':
 				{
-					switch (type[1])
+					switch (cfi[1])
 					{
 						case 'R':
 						{
-							switch (type[2])
+							switch (cfi[2])
 							{
 								case 'I':
 									return SecurityTypes.Index;
@@ -3688,7 +3741,7 @@ namespace StockSharp.Algo
 
 						case 'M':
 						{
-							switch (type[2])
+							switch (cfi[2])
 							{
 								case 'B':
 									return SecurityTypes.CryptoCurrency;
@@ -3718,6 +3771,35 @@ namespace StockSharp.Algo
 		}
 
 		/// <summary>
+		/// To convert the type in the ISO 10962 standard into <see cref="OptionTypes"/>.
+		/// </summary>
+		/// <param name="cfi">Type in ISO 10962 standard.</param>
+		/// <returns>Option type.</returns>
+		public static OptionTypes? Iso10962ToOptionType(this string cfi)
+		{
+			if (cfi.IsEmpty())
+				throw new ArgumentNullException(nameof(cfi));
+
+			if (cfi[0] != 'O')
+				throw new ArgumentOutOfRangeException(nameof(cfi), LocalizedStrings.Str1604Params.Put(cfi));
+
+			if (cfi.Length < 2)
+				throw new ArgumentOutOfRangeException(nameof(cfi), LocalizedStrings.Str1605Params.Put(cfi));
+
+			switch (cfi[1])
+			{
+				case 'C':
+					return OptionTypes.Call;
+				case 'P':
+					return OptionTypes.Put;
+				case ' ':
+					return null;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(cfi), LocalizedStrings.Str1606Params.Put(cfi));
+			}
+		}
+
+		/// <summary>
 		/// To get the number of operations, or discard the exception, if no information available.
 		/// </summary>
 		/// <param name="message">Operations.</param>
@@ -3727,12 +3809,12 @@ namespace StockSharp.Algo
 			if (message == null)
 				throw new ArgumentNullException(nameof(message));
 
-			var volume = message.Volume;
+			var volume = message.OrderVolume ?? message.TradeVolume;
 
 			if (volume != null)
 				return volume.Value;
 
-			var errorMsg = message.ExecutionType == ExecutionTypes.Tick || message.ExecutionType == ExecutionTypes.Trade
+			var errorMsg = message.ExecutionType == ExecutionTypes.Tick || message.HasTradeInfo()
 				? LocalizedStrings.Str1022Params.Put((object)message.TradeId ?? message.TradeStringId)
 				: LocalizedStrings.Str927Params.Put((object)message.OrderId ?? message.OrderStringId);
 
@@ -3757,7 +3839,7 @@ namespace StockSharp.Algo
 			throw new ArgumentOutOfRangeException(nameof(message), null, LocalizedStrings.Str925);
 		}
 
-		private class TickEnumerable : SimpleEnumerable<ExecutionMessage>, IEnumerableEx<ExecutionMessage>
+		private class TickEnumerable : SimpleEnumerable<ExecutionMessage>//, IEnumerableEx<ExecutionMessage>
 		{
 			private class TickEnumerator : IEnumerator<ExecutionMessage>
 			{
@@ -3805,18 +3887,18 @@ namespace StockSharp.Algo
 				}
 			}
 
-			private readonly IEnumerableEx<Level1ChangeMessage> _level1;
+			//private readonly IEnumerable<Level1ChangeMessage> _level1;
 
-			public TickEnumerable(IEnumerableEx<Level1ChangeMessage> level1)
+			public TickEnumerable(IEnumerable<Level1ChangeMessage> level1)
 				: base(() => new TickEnumerator(level1.GetEnumerator()))
 			{
 				if (level1 == null)
 					throw new ArgumentNullException(nameof(level1));
 
-				_level1 = level1;
+				//_level1 = level1;
 			}
 
-			int IEnumerableEx.Count => _level1.Count;
+			//int IEnumerableEx.Count => _level1.Count;
 		}
 
 		/// <summary>
@@ -3824,7 +3906,7 @@ namespace StockSharp.Algo
 		/// </summary>
 		/// <param name="level1">Level1 data.</param>
 		/// <returns>Tick data.</returns>
-		public static IEnumerableEx<ExecutionMessage> ToTicks(this IEnumerableEx<Level1ChangeMessage> level1)
+		public static IEnumerable<ExecutionMessage> ToTicks(this IEnumerable<Level1ChangeMessage> level1)
 		{
 			return new TickEnumerable(level1);
 		}
@@ -3858,7 +3940,7 @@ namespace StockSharp.Algo
 				SecurityId = level1.SecurityId,
 				TradeId = (long?)level1.Changes.TryGetValue(Level1Fields.LastTradeId),
 				TradePrice = (decimal?)level1.Changes.TryGetValue(Level1Fields.LastTradePrice),
-				Volume = (decimal?)level1.Changes.TryGetValue(Level1Fields.LastTradeVolume),
+				TradeVolume = (decimal?)level1.Changes.TryGetValue(Level1Fields.LastTradeVolume),
 				OriginSide = (Sides?)level1.Changes.TryGetValue(Level1Fields.LastTradeOrigin),
 				ServerTime = (DateTimeOffset?)level1.Changes.TryGetValue(Level1Fields.LastTradeTime) ?? level1.ServerTime,
 				IsUpTick = (bool?)level1.Changes.TryGetValue(Level1Fields.LastTradeUpDown),
@@ -3866,7 +3948,7 @@ namespace StockSharp.Algo
 			};
 		}
 
-		private class OrderBookEnumerable : SimpleEnumerable<QuoteChangeMessage>, IEnumerableEx<QuoteChangeMessage>
+		private class OrderBookEnumerable : SimpleEnumerable<QuoteChangeMessage>//, IEnumerableEx<QuoteChangeMessage>
 		{
 			private class OrderBookEnumerator : IEnumerator<QuoteChangeMessage>
 			{
@@ -3946,18 +4028,18 @@ namespace StockSharp.Algo
 				}
 			}
 
-			private readonly IEnumerableEx<Level1ChangeMessage> _level1;
+			//private readonly IEnumerable<Level1ChangeMessage> _level1;
 
-			public OrderBookEnumerable(IEnumerableEx<Level1ChangeMessage> level1)
+			public OrderBookEnumerable(IEnumerable<Level1ChangeMessage> level1)
 				: base(() => new OrderBookEnumerator(level1.GetEnumerator()))
 			{
 				if (level1 == null)
 					throw new ArgumentNullException(nameof(level1));
 
-				_level1 = level1;
+				//_level1 = level1;
 			}
 
-			int IEnumerableEx.Count => _level1.Count;
+			//int IEnumerableEx.Count => _level1.Count;
 		}
 
 		/// <summary>
@@ -3965,7 +4047,7 @@ namespace StockSharp.Algo
 		/// </summary>
 		/// <param name="level1">Level1 data.</param>
 		/// <returns>Market depths.</returns>
-		public static IEnumerableEx<QuoteChangeMessage> ToOrderBooks(this IEnumerableEx<Level1ChangeMessage> level1)
+		public static IEnumerable<QuoteChangeMessage> ToOrderBooks(this IEnumerable<Level1ChangeMessage> level1)
 		{
 			return new OrderBookEnumerable(level1);
 		}
@@ -3981,6 +4063,26 @@ namespace StockSharp.Algo
 				throw new ArgumentNullException(nameof(level1));
 
 			return level1.Changes.ContainsKey(Level1Fields.BestBidPrice) || level1.Changes.ContainsKey(Level1Fields.BestAskPrice);
+		}
+
+		/// <summary>
+		/// To check the specified date is today.
+		/// </summary>
+		/// <param name="date">The specified date.</param>
+		/// <returns><see langword="true"/> if the specified date is today, otherwise, <see langword="false"/>.</returns>
+		public static bool IsToday(this DateTimeOffset date)
+		{
+			return date.DateTime == DateTime.Today;
+		}
+
+		/// <summary>
+		/// To check the specified date is GTC.
+		/// </summary>
+		/// <param name="date">The specified date.</param>
+		/// <returns><see langword="true"/> if the specified date is GTC, otherwise, <see langword="false"/>.</returns>
+		public static bool IsGtc(this DateTimeOffset date)
+		{
+			return date == DateTimeOffset.MaxValue;
 		}
 	}
 }

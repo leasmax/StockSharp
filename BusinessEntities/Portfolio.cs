@@ -16,9 +16,7 @@ Copyright 2010 by StockSharp, LLC
 namespace StockSharp.BusinessEntities
 {
 	using System;
-	using System.ComponentModel;
 	using System.Runtime.Serialization;
-	using System.Xml.Serialization;
 
 	using Ecng.Serialization;
 
@@ -62,7 +60,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_name = value;
-				NotifyChanged("Name");
+				NotifyChanged(nameof(Name));
 			}
 		}
 
@@ -84,7 +82,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_leverage = value;
-				NotifyChanged("Leverage");
+				NotifyChanged(nameof(Leverage));
 			}
 		}
 
@@ -104,25 +102,25 @@ namespace StockSharp.BusinessEntities
 			set
 			{
 				_currency = value;
-				NotifyChanged("Currency");
+				NotifyChanged(nameof(Currency));
 			}
 		}
 
-		[field: NonSerialized]
-		private IConnector _connector;
+		//[field: NonSerialized]
+		//private IConnector _connector;
 
-		/// <summary>
-		/// Connection to the trading system, through which this portfolio has been loaded.
-		/// </summary>
-		[Ignore]
-		[XmlIgnore]
-		[Browsable(false)]
-		[Obsolete("The property Connector was obsoleted and is always null.")]
-		public IConnector Connector
-		{
-			get { return _connector; }
-			set { _connector = value; }
-		}
+		///// <summary>
+		///// Connection to the trading system, through which this portfolio has been loaded.
+		///// </summary>
+		//[Ignore]
+		//[XmlIgnore]
+		//[Browsable(false)]
+		//[Obsolete("The property Connector was obsoleted and is always null.")]
+		//public IConnector Connector
+		//{
+		//	get { return _connector; }
+		//	set { _connector = value; }
+		//}
 
 		/// <summary>
 		/// Exchange board, for which the current portfolio is active.
@@ -153,7 +151,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_state = value;
-				NotifyChanged("State");
+				NotifyChanged(nameof(State));
 			}
 		}
 
@@ -162,10 +160,7 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// Portfolio associated with the orders received through the orders log.
 		/// </summary>
-		public static Portfolio AnonymousPortfolio
-		{
-			get { return _anonymousPortfolio; }
-		}
+		public static Portfolio AnonymousPortfolio => _anonymousPortfolio;
 
 		/// <summary>
 		/// Create a copy of <see cref="Portfolio"/>.

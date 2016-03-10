@@ -38,16 +38,17 @@ namespace StockSharp.Messages
 		Tick,
 
 		/// <summary>
-		/// Order log.
+		/// Transaction.
 		/// </summary>
 		[EnumMember]
-		Order,
+		Transaction,
 
 		/// <summary>
-		/// Own trade.
+		/// Obsolete.
 		/// </summary>
 		[EnumMember]
-		Trade,
+		[Obsolete]
+		Obsolete,
 
 		/// <summary>
 		/// Order log.
@@ -89,6 +90,16 @@ namespace StockSharp.Messages
 		[DisplayNameLoc(LocalizedStrings.ClientCodeKey)]
 		[DescriptionLoc(LocalizedStrings.ClientCodeDescKey)]
 		public string ClientCode { get; set; }
+
+		/// <summary>
+		/// Broker firm code.
+		/// </summary>
+		[DataMember]
+		[MainCategory]
+		[CategoryLoc(LocalizedStrings.Str2593Key)]
+		[DisplayNameLoc(LocalizedStrings.BrokerKey)]
+		[DescriptionLoc(LocalizedStrings.Str2619Key)]
+		public string BrokerCode { get; set; }
 
 		/// <summary>
 		/// The depositary where the physical security.
@@ -192,6 +203,16 @@ namespace StockSharp.Messages
 		public string DerivedOrderStringId { get; set; }
 
 		/// <summary>
+		/// Is the message contains order info.
+		/// </summary>
+		public bool HasOrderInfo { get; set; }
+
+		/// <summary>
+		/// Is the message contains trade info.
+		/// </summary>
+		public bool HasTradeInfo { get; set; }
+
+		/// <summary>
 		/// Order price.
 		/// </summary>
 		[DataMember]
@@ -204,11 +225,21 @@ namespace StockSharp.Messages
 		/// Number of contracts in an order.
 		/// </summary>
 		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.VolumeKey)]
+		[DisplayNameLoc(LocalizedStrings.VolumeOrderKey)]
 		[DescriptionLoc(LocalizedStrings.OrderVolumeKey)]
 		[MainCategory]
 		[Nullable]
-		public decimal? Volume { get; set; }
+		public decimal? OrderVolume { get; set; }
+
+		/// <summary>
+		/// Number of contracts in an trade.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.VolumeTradeKey)]
+		[DescriptionLoc(LocalizedStrings.TradeVolumeKey)]
+		[MainCategory]
+		[Nullable]
+		public decimal? TradeVolume { get; set; }
 
 		/// <summary>
 		/// Visible quantity of contracts in order.
@@ -246,7 +277,7 @@ namespace StockSharp.Messages
 		[DisplayNameLoc(LocalizedStrings.Str132Key)]
 		[DescriptionLoc(LocalizedStrings.Str133Key)]
 		[MainCategory]
-		public OrderTypes OrderType { get; set; }
+		public OrderTypes? OrderType { get; set; }
 
 		/// <summary>
 		/// System order status.
@@ -397,7 +428,7 @@ namespace StockSharp.Messages
 		//public bool IsFinished { get; set; }
 
 		/// <summary>
-		/// Is tick uptrend or downtrend in price. Uses only <see cref="ExecutionMessage.ExecutionType"/> for <see cref="ExecutionTypes.Tick"/>.
+		/// Is tick uptrend or downtrend in price. Uses only <see cref="ExecutionType"/> for <see cref="ExecutionTypes.Tick"/>.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str157Key)]
@@ -407,7 +438,7 @@ namespace StockSharp.Messages
 		public bool? IsUpTick { get; set; }
 
 		/// <summary>
-		/// Commission (broker, exchange etc.).  Uses when <see cref="ExecutionMessage.ExecutionType"/> set to <see cref="ExecutionTypes.Order"/> or <see cref="ExecutionTypes.Trade"/>.
+		/// Commission (broker, exchange etc.).  Uses when <see cref="ExecutionType"/> set to <see cref="ExecutionTypes.Transaction"/>.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str159Key)]
@@ -417,7 +448,7 @@ namespace StockSharp.Messages
 		public decimal? Commission { get; set; }
 
 		/// <summary>
-		/// Network latency. Uses when <see cref="ExecutionMessage.ExecutionType"/> set to <see cref="ExecutionTypes.Order"/>.
+		/// Network latency. Uses when <see cref="ExecutionType"/> set to <see cref="ExecutionTypes.Transaction"/>.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str161Key)]
@@ -427,7 +458,7 @@ namespace StockSharp.Messages
 		public TimeSpan? Latency { get; set; }
 
 		/// <summary>
-		/// Slippage in trade price. Uses when <see cref="ExecutionMessage.ExecutionType"/> set to <see cref="ExecutionTypes.Trade"/>.
+		/// Slippage in trade price. Uses when <see cref="ExecutionType"/> set to <see cref="ExecutionTypes.Transaction"/>.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str163Key)]
@@ -437,7 +468,7 @@ namespace StockSharp.Messages
 		public decimal? Slippage { get; set; }
 
 		/// <summary>
-		/// User order id. Uses when <see cref="ExecutionMessage.ExecutionType"/> set to <see cref="ExecutionTypes.Order"/>.
+		/// User order id. Uses when <see cref="ExecutionType"/> set to <see cref="ExecutionTypes.Transaction"/>.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str165Key)]
@@ -489,9 +520,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + ",T(S)={0:yyyy/MM/dd HH:mm:ss.fff},({1}),Sec={2},Ord={3}/{4}/{5},Fail={6},Price={7},Vol={8},Bal={9},TId={10},Pf={11},TPrice={12},UId={13},State={14}"
-				.Put(ServerTime, ExecutionType, SecurityId, OrderId, TransactionId, OriginalTransactionId,
-					Error, OrderPrice, Volume, Balance, TradeId, PortfolioName, TradePrice, UserOrderId, OrderState);
+			return base.ToString() + $",T(S)={ServerTime:yyyy/MM/dd HH:mm:ss.fff},({ExecutionType}),Sec={SecurityId},Ord={OrderId}/{TransactionId}/{OriginalTransactionId},Fail={Error},Price={OrderPrice},OrdVol={OrderVolume},TrVol={TradeVolume},Bal={Balance},TId={TradeId},Pf={PortfolioName},TPrice={TradePrice},UId={UserOrderId},State={OrderState}";
 		}
 
 		/// <summary>
@@ -506,6 +535,7 @@ namespace StockSharp.Messages
 				Comment = Comment,
 				Condition = Condition.CloneNullable(),
 				ClientCode = ClientCode,
+				BrokerCode = BrokerCode,
 				Currency = Currency,
 				ServerTime = ServerTime,
 				DepoName = DepoName,
@@ -536,7 +566,8 @@ namespace StockSharp.Messages
 				TradeStatus = TradeStatus,
 				TransactionId = TransactionId,
 				OriginalTransactionId = OriginalTransactionId,
-				Volume = Volume,
+				OrderVolume = OrderVolume,
+				TradeVolume = TradeVolume,
 				//IsFinished = IsFinished,
 				VisibleVolume = VisibleVolume,
 				IsUpTick = IsUpTick,
@@ -550,6 +581,9 @@ namespace StockSharp.Messages
 
 				PnL = PnL,
 				Position = Position,
+
+				HasTradeInfo = HasTradeInfo,
+				HasOrderInfo = HasOrderInfo
 			};
 
 			this.CopyExtensionInfo(clone);

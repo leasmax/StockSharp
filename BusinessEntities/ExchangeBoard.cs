@@ -46,15 +46,9 @@ namespace StockSharp.BusinessEntities
 			private readonly CachedSynchronizedDictionary<string, ExchangeBoard> _boards = new CachedSynchronizedDictionary<string, ExchangeBoard>(StringComparer.InvariantCultureIgnoreCase);
 			private readonly CachedSynchronizedDictionary<string, Exchange> _exchanges = new CachedSynchronizedDictionary<string, Exchange>(StringComparer.InvariantCultureIgnoreCase);
 
-			IEnumerable<ExchangeBoard> IExchangeInfoProvider.Boards
-			{
-				get { return _boards.CachedValues; }
-			}
+			IEnumerable<ExchangeBoard> IExchangeInfoProvider.Boards => _boards.CachedValues;
 
-			IEnumerable<Exchange> IExchangeInfoProvider.Exchanges
-			{
-				get { return _exchanges.CachedValues; }
-			}
+			IEnumerable<Exchange> IExchangeInfoProvider.Exchanges => _exchanges.CachedValues;
 
 			ExchangeBoard IExchangeInfoProvider.GetExchangeBoard(string code)
 			{
@@ -77,7 +71,7 @@ namespace StockSharp.BusinessEntities
 						return;
 				}
 
-				BoardAdded.SafeInvoke(board);
+				BoardAdded?.Invoke(board);
 			}
 
 			void IExchangeInfoProvider.Save(Exchange exchange)
@@ -91,7 +85,7 @@ namespace StockSharp.BusinessEntities
 						return;
 				}
 
-				ExchangeAdded.SafeInvoke(exchange);
+				ExchangeAdded?.Invoke(exchange);
 			}
 
 			public event Action<ExchangeBoard> BoardAdded;
@@ -135,7 +129,7 @@ namespace StockSharp.BusinessEntities
 		//private static IEnumerable<DateTime> GetDefaultRussianHolidays(DateTime startYear, DateTime endYear)
 		//{
 		//	if (startYear >= endYear)
-		//		throw new ArgumentOutOfRangeException("endYear");
+		//		throw new ArgumentOutOfRangeException(nameof(endYear));
 
 		//	var holidays = new List<DateTime>();
 
@@ -208,7 +202,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_code = value;
-				Notify("Code");
+				Notify(nameof(Code));
 			}
 		}
 
@@ -231,7 +225,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_expiryTime = value;
-				Notify("ExpiryTime");
+				Notify(nameof(ExpiryTime));
 			}
 		}
 
@@ -260,7 +254,7 @@ namespace StockSharp.BusinessEntities
 			set
 			{
 				_isSupportAtomicReRegister = value;
-				Notify("IsSupportAtomicReRegister");
+				Notify(nameof(IsSupportAtomicReRegister));
 			}
 		}
 
@@ -279,7 +273,7 @@ namespace StockSharp.BusinessEntities
 			set
 			{
 				_isSupportMarketOrders = value;
-				Notify("IsSupportMarketOrders");
+				Notify(nameof(IsSupportMarketOrders));
 			}
 		}
 
@@ -305,7 +299,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_workingTime = value;
-				Notify("WorkingTime");
+				Notify(nameof(WorkingTime));
 			}
 		}
 
@@ -330,7 +324,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_timeZone = value;
-				Notify("TimeZone");
+				Notify(nameof(TimeZone));
 			}
 		}
 
@@ -433,7 +427,7 @@ namespace StockSharp.BusinessEntities
 					throw new ArgumentNullException(nameof(value));
 
 				_extensionInfo = value;
-				Notify("ExtensionInfo");
+				Notify(nameof(ExtensionInfo));
 			}
 		}
 
@@ -455,7 +449,7 @@ namespace StockSharp.BusinessEntities
 
 		private void Notify(string info)
 		{
-			_propertyChanged.SafeInvoke(this, info);
+			_propertyChanged?.Invoke(this, info);
 		}
 
 		/// <summary>
@@ -512,18 +506,12 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// Is MICEX board.
 		/// </summary>
-		public bool IsMicex
-		{
-			get { return Exchange == Exchange.Moex && this != Forts; }
-		}
+		public bool IsMicex => Exchange == Exchange.Moex && this != Forts;
 
 		/// <summary>
 		/// Is the UX exchange stock market board.
 		/// </summary>
-		public bool IsUxStock
-		{
-			get { return Exchange == Exchange.Ux && this != Ux; }
-		}
+		public bool IsUxStock => Exchange == Exchange.Ux && this != Ux;
 
 		/// <summary>
 		/// Load settings.
@@ -531,13 +519,13 @@ namespace StockSharp.BusinessEntities
 		/// <param name="storage">Settings storage.</param>
 		public void Load(SettingsStorage storage)
 		{
-			Exchange = storage.GetValue<SettingsStorage>("Exchange").Load<Exchange>();
-			Code = storage.GetValue<string>("Code");
-			IsSupportMarketOrders = storage.GetValue<bool>("IsSupportMarketOrders");
-			IsSupportAtomicReRegister = storage.GetValue<bool>("IsSupportAtomicReRegister");
-			ExpiryTime = storage.GetValue<TimeSpan>("ExpiryTime");
-			WorkingTime = storage.GetValue<SettingsStorage>("WorkingTime").Load<WorkingTime>();
-			TimeZone = storage.GetValue("TimeZone", TimeZone);
+			Exchange = storage.GetValue<SettingsStorage>(nameof(Exchange)).Load<Exchange>();
+			Code = storage.GetValue<string>(nameof(Code));
+			IsSupportMarketOrders = storage.GetValue<bool>(nameof(IsSupportMarketOrders));
+			IsSupportAtomicReRegister = storage.GetValue<bool>(nameof(IsSupportAtomicReRegister));
+			ExpiryTime = storage.GetValue<TimeSpan>(nameof(ExpiryTime));
+			WorkingTime = storage.GetValue<SettingsStorage>(nameof(WorkingTime)).Load<WorkingTime>();
+			TimeZone = storage.GetValue(nameof(TimeZone), TimeZone);
 		}
 
 		/// <summary>
@@ -546,13 +534,13 @@ namespace StockSharp.BusinessEntities
 		/// <param name="storage">Settings storage.</param>
 		public void Save(SettingsStorage storage)
 		{
-			storage.SetValue("Exchange", Exchange.Save());
-			storage.SetValue("Code", Code);
-			storage.SetValue("IsSupportMarketOrders", IsSupportMarketOrders);
-			storage.SetValue("IsSupportAtomicReRegister", IsSupportAtomicReRegister);
-			storage.SetValue("ExpiryTime", ExpiryTime);
-			storage.SetValue("WorkingTime", WorkingTime.Save());
-			storage.SetValue("TimeZone", TimeZone);
+			storage.SetValue(nameof(Exchange), Exchange.Save());
+			storage.SetValue(nameof(Code), Code);
+			storage.SetValue(nameof(IsSupportMarketOrders), IsSupportMarketOrders);
+			storage.SetValue(nameof(IsSupportAtomicReRegister), IsSupportAtomicReRegister);
+			storage.SetValue(nameof(ExpiryTime), ExpiryTime);
+			storage.SetValue(nameof(WorkingTime), WorkingTime.Save());
+			storage.SetValue(nameof(TimeZone), TimeZone);
 		}
 	}
 }

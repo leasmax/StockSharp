@@ -19,11 +19,9 @@ namespace StockSharp.BusinessEntities
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
-	using System.Xml.Serialization;
 
 	using Ecng.Collections;
 	using Ecng.Common;
-	using Ecng.Serialization;
 
 	using MoreLinq;
 
@@ -80,20 +78,20 @@ namespace StockSharp.BusinessEntities
 		/// </summary>
 		public Security Security { get; }
 
-		[field: NonSerialized]
-		private IConnector _connector;
+		//[field: NonSerialized]
+		//private IConnector _connector;
 
-		/// <summary>
-		/// Connection to the trading system.
-		/// </summary>
-		[Ignore]
-		[XmlIgnore]
-		[Obsolete("The property Connector was obsoleted and is always null.")]
-		public IConnector Connector
-		{
-			get { return _connector; }
-			set { _connector = value; }
-		}
+		///// <summary>
+		///// Connection to the trading system.
+		///// </summary>
+		//[Ignore]
+		//[XmlIgnore]
+		//[Obsolete("The property Connector was obsoleted and is always null.")]
+		//public IConnector Connector
+		//{
+		//	get { return _connector; }
+		//	set { _connector = value; }
+		//}
 
 		/// <summary>
 		/// Automatically check for quotes by <see cref="Verify()"/>.
@@ -192,10 +190,7 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// The best pair. If the order book is empty, will be returned <see langword="null" />.
 		/// </summary>
-		public MarketDepthPair BestPair
-		{
-			get { return GetPair(0); }
-		}
+		public MarketDepthPair BestPair => GetPair(0);
 
 		/// <summary>
 		/// To get the total price size by bids.
@@ -295,7 +290,7 @@ namespace StockSharp.BusinessEntities
 					return;
 
 				_depth = value;
-				DepthChanged.SafeInvoke();
+				DepthChanged?.Invoke();
 			}
 		}
 
@@ -747,7 +742,7 @@ namespace StockSharp.BusinessEntities
 			RaiseQuotesChanged();
 
 			if (outOfDepthQuote != null)
-				QuoteOutOfDepth.SafeInvoke(outOfDepthQuote);
+				QuoteOutOfDepth?.Invoke(outOfDepthQuote);
 		}
 
 		#region IEnumerable<Quote>
@@ -1031,7 +1026,7 @@ namespace StockSharp.BusinessEntities
 
 		private void RaiseQuotesChanged()
 		{
-			QuotesChanged.SafeInvoke();
+			QuotesChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -1138,9 +1133,6 @@ namespace StockSharp.BusinessEntities
 				quote.Security == Security;
 		}
 
-		SyncObject ISynchronizedCollection.SyncRoot
-		{
-			get { return _syncRoot; }
-		}
+		SyncObject ISynchronizedCollection.SyncRoot => _syncRoot;
 	}
 }

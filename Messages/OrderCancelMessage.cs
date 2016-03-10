@@ -18,8 +18,6 @@ namespace StockSharp.Messages
 	using System;
 	using System.Runtime.Serialization;
 
-	using Ecng.Common;
-
 	/// <summary>
 	/// A message containing the data for the cancellation of the order.
 	/// </summary>
@@ -38,12 +36,6 @@ namespace StockSharp.Messages
 		/// </summary>
 		[DataMember]
 		public string OrderStringId { get; set; }
-
-		/// <summary>
-		/// Order cancellation transaction id.
-		/// </summary>
-		[DataMember]
-		public long TransactionId { get; set; }
 
 		/// <summary>
 		/// Transaction ID cancellation order.
@@ -68,6 +60,15 @@ namespace StockSharp.Messages
 		/// </summary>
 		public OrderCancelMessage()
 			: base(MessageTypes.OrderCancel)
+		{
+		}
+
+		/// <summary>
+		/// Initialize <see cref="OrderCancelMessage"/>.
+		/// </summary>
+		/// <param name="type">Message type.</param>
+		protected OrderCancelMessage(MessageTypes type)
+			: base(type)
 		{
 		}
 
@@ -101,7 +102,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + ",OriginTransId={0},TransId={1},OrderId={2}".Put(OrderTransactionId, TransactionId, OrderId);
+			return base.ToString() + $",OriginTransId={OrderTransactionId},TransId={TransactionId},OrderId={OrderId}";
 		}
 	}
 }

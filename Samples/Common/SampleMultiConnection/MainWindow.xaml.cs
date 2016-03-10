@@ -30,7 +30,6 @@ namespace SampleMultiConnection
 	using StockSharp.Algo.Storages;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Logging;
-	
 	using StockSharp.Configuration;
 	using StockSharp.Localization;
 
@@ -68,6 +67,8 @@ namespace SampleMultiConnection
 
 			var entityRegistry = ConfigManager.GetService<IEntityRegistry>();
 			var storageRegistry = ConfigManager.GetService<IStorageRegistry>();
+
+			SerializationContext.DelayAction = entityRegistry.DelayAction = new DelayAction(entityRegistry.Storage, ex => ex.LogError());
 
 			Connector = new Connector(entityRegistry, storageRegistry);
 			logManager.Sources.Add(Connector);
@@ -133,6 +134,9 @@ namespace SampleMultiConnection
 			if (Connector.StorageAdapter == null)
 				return;
 
+			if (!File.Exists("StockSharp.db"))
+				File.WriteAllBytes("StockSharp.db", Properties.Resources.StockSharp);
+
 			Connector.StorageAdapter.DaysLoad = TimeSpan.FromDays(3);
 			Connector.StorageAdapter.Load();
 		}
@@ -154,6 +158,8 @@ namespace SampleMultiConnection
 			_portfoliosWindow.Close();
 
 			Connector.Dispose();
+
+			ConfigManager.GetService<IEntityRegistry>().DelayAction.WaitFlush();
 
 			base.OnClosing(e);
 		}
@@ -227,7 +233,7 @@ namespace SampleMultiConnection
 		private static void ShowOrHide(Window window)
 		{
 			if (window == null)
-				throw new ArgumentNullException("window");
+				throw new ArgumentNullException(nameof(window));
 
 			if (window.Visibility == Visibility.Visible)
 				window.Hide();

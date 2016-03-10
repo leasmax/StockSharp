@@ -101,121 +101,116 @@ namespace StockSharp.Messages
 		/// </summary>
 		/// <param name="message"><see cref="OrderMessage"/>.</param>
 		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderMessage message)
+		public static ExecutionMessage CreateReply(this OrderMessage message)
 		{
-			switch (message.Type)
-			{
-				case MessageTypes.OrderRegister:
-					return ((OrderRegisterMessage)message).ToExecutionMessage();
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
 
-				case MessageTypes.OrderCancel:
-					return ((OrderCancelMessage)message).ToExecutionMessage();
-
-				case MessageTypes.OrderGroupCancel:
-					return ((OrderGroupCancelMessage)message).ToExecutionMessage();
-
-				case MessageTypes.OrderReplace:
-					return ((OrderReplaceMessage)message).ToExecutionMessage();
-
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
-		}
-
-		/// <summary>
-		/// Cast <see cref="OrderGroupCancelMessage"/> to the <see cref="ExecutionMessage"/>.
-		/// </summary>
-		/// <param name="message"><see cref="OrderGroupCancelMessage"/>.</param>
-		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderGroupCancelMessage message)
-		{
 			return new ExecutionMessage
 			{
 				OriginalTransactionId = message.TransactionId,
-				ExecutionType = ExecutionTypes.Order,
+				ExecutionType = ExecutionTypes.Transaction,
+				HasOrderInfo = true,
 			};
 		}
 
-		/// <summary>
-		/// Cast <see cref="OrderPairReplaceMessage"/> to the <see cref="ExecutionMessage"/>.
-		/// </summary>
-		/// <param name="message"><see cref="OrderPairReplaceMessage"/>.</param>
-		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderPairReplaceMessage message)
-		{
-			throw new NotImplementedException();
-			//return new ExecutionMessage
-			//{
-			//	LocalTime = message.LocalTime,
-			//	OriginalTransactionId = message.TransactionId,
-			//	Action = ExecutionActions.Canceled,
-			//};
-		}
+		///// <summary>
+		///// Cast <see cref="OrderGroupCancelMessage"/> to the <see cref="ExecutionMessage"/>.
+		///// </summary>
+		///// <param name="message"><see cref="OrderGroupCancelMessage"/>.</param>
+		///// <returns><see cref="ExecutionMessage"/>.</returns>
+		//public static ExecutionMessage ToExecutionMessage(this OrderGroupCancelMessage message)
+		//{
+		//	return new ExecutionMessage
+		//	{
+		//		OriginalTransactionId = message.TransactionId,
+		//		ExecutionType = ExecutionTypes.Transaction,
+		//	};
+		//}
 
-		/// <summary>
-		/// Cast <see cref="OrderCancelMessage"/> to the <see cref="ExecutionMessage"/>.
-		/// </summary>
-		/// <param name="message"><see cref="OrderCancelMessage"/>.</param>
-		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderCancelMessage message)
-		{
-			return new ExecutionMessage
-			{
-				SecurityId = message.SecurityId,
-				OriginalTransactionId = message.TransactionId,
-				//OriginalTransactionId = message.OriginalTransactionId,
-				OrderId = message.OrderId,
-				OrderType = message.OrderType,
-				PortfolioName = message.PortfolioName,
-				ExecutionType = ExecutionTypes.Order,
-				UserOrderId = message.UserOrderId,
-			};
-		}
+		///// <summary>
+		///// Cast <see cref="OrderPairReplaceMessage"/> to the <see cref="ExecutionMessage"/>.
+		///// </summary>
+		///// <param name="message"><see cref="OrderPairReplaceMessage"/>.</param>
+		///// <returns><see cref="ExecutionMessage"/>.</returns>
+		//public static ExecutionMessage ToExecutionMessage(this OrderPairReplaceMessage message)
+		//{
+		//	throw new NotImplementedException();
+		//	//return new ExecutionMessage
+		//	//{
+		//	//	LocalTime = message.LocalTime,
+		//	//	OriginalTransactionId = message.TransactionId,
+		//	//	Action = ExecutionActions.Canceled,
+		//	//};
+		//}
 
-		/// <summary>
-		/// Cast <see cref="OrderReplaceMessage"/> to the <see cref="ExecutionMessage"/>.
-		/// </summary>
-		/// <param name="message"><see cref="OrderReplaceMessage"/>.</param>
-		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderReplaceMessage message)
-		{
-			return new ExecutionMessage
-			{
-				SecurityId = message.SecurityId,
-				OriginalTransactionId = message.TransactionId,
-				OrderType = message.OrderType,
-				OrderPrice = message.Price,
-				Volume = message.Volume,
-				Side = message.Side,
-				PortfolioName = message.PortfolioName,
-				ExecutionType = ExecutionTypes.Order,
-				Condition = message.Condition,
-				UserOrderId = message.UserOrderId,
-			};
-		}
+		///// <summary>
+		///// Cast <see cref="OrderCancelMessage"/> to the <see cref="ExecutionMessage"/>.
+		///// </summary>
+		///// <param name="message"><see cref="OrderCancelMessage"/>.</param>
+		///// <returns><see cref="ExecutionMessage"/>.</returns>
+		//public static ExecutionMessage ToExecutionMessage(this OrderCancelMessage message)
+		//{
+		//	return new ExecutionMessage
+		//	{
+		//		SecurityId = message.SecurityId,
+		//		OriginalTransactionId = message.TransactionId,
+		//		//OriginalTransactionId = message.OriginalTransactionId,
+		//		OrderId = message.OrderId,
+		//		OrderType = message.OrderType,
+		//		PortfolioName = message.PortfolioName,
+		//		ExecutionType = ExecutionTypes.Transaction,
+		//		UserOrderId = message.UserOrderId,
+		//		HasOrderInfo = true,
+		//	};
+		//}
 
-		/// <summary>
-		/// Cast <see cref="OrderRegisterMessage"/> to the <see cref="ExecutionMessage"/>.
-		/// </summary>
-		/// <param name="message"><see cref="OrderRegisterMessage"/>.</param>
-		/// <returns><see cref="ExecutionMessage"/>.</returns>
-		public static ExecutionMessage ToExecutionMessage(this OrderRegisterMessage message)
-		{
-			return new ExecutionMessage
-			{
-				SecurityId = message.SecurityId,
-				OriginalTransactionId = message.TransactionId,
-				OrderType = message.OrderType,
-				OrderPrice = message.Price,
-				Volume = message.Volume,
-				Balance = message.Volume,
-				Side = message.Side,
-				PortfolioName = message.PortfolioName,
-				ExecutionType = ExecutionTypes.Order,
-				Condition = message.Condition,
-				UserOrderId = message.UserOrderId,
-			};
-		}
+		///// <summary>
+		///// Cast <see cref="OrderReplaceMessage"/> to the <see cref="ExecutionMessage"/>.
+		///// </summary>
+		///// <param name="message"><see cref="OrderReplaceMessage"/>.</param>
+		///// <returns><see cref="ExecutionMessage"/>.</returns>
+		//public static ExecutionMessage ToExecutionMessage(this OrderReplaceMessage message)
+		//{
+		//	return new ExecutionMessage
+		//	{
+		//		SecurityId = message.SecurityId,
+		//		OriginalTransactionId = message.TransactionId,
+		//		OrderType = message.OrderType,
+		//		OrderPrice = message.Price,
+		//		OrderVolume = message.Volume,
+		//		Side = message.Side,
+		//		PortfolioName = message.PortfolioName,
+		//		ExecutionType = ExecutionTypes.Transaction,
+		//		Condition = message.Condition,
+		//		UserOrderId = message.UserOrderId,
+		//		HasOrderInfo = true,
+		//	};
+		//}
+
+		///// <summary>
+		///// Cast <see cref="OrderRegisterMessage"/> to the <see cref="ExecutionMessage"/>.
+		///// </summary>
+		///// <param name="message"><see cref="OrderRegisterMessage"/>.</param>
+		///// <returns><see cref="ExecutionMessage"/>.</returns>
+		//public static ExecutionMessage ToExecutionMessage(this OrderRegisterMessage message)
+		//{
+		//	return new ExecutionMessage
+		//	{
+		//		SecurityId = message.SecurityId,
+		//		OriginalTransactionId = message.TransactionId,
+		//		OrderType = message.OrderType,
+		//		OrderPrice = message.Price,
+		//		OrderVolume = message.Volume,
+		//		Balance = message.Volume,
+		//		Side = message.Side,
+		//		PortfolioName = message.PortfolioName,
+		//		ExecutionType = ExecutionTypes.Transaction,
+		//		Condition = message.Condition,
+		//		UserOrderId = message.UserOrderId,
+		//		HasOrderInfo = true,
+		//	};
+		//}
 
 		/// <summary>
 		/// Copy extended info.
@@ -372,6 +367,55 @@ namespace StockSharp.Messages
 				throw new ArgumentNullException(nameof(messageType));
 
 			return messageType.IsSubclassOf(typeof(CandleMessage));
+		}
+
+		/// <summary>
+		/// Determines whether the specified message contains order information.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <returns><see langword="true"/> if the specified message contains order information, otherwise, <see langword="false"/>.</returns>
+		public static bool HasOrderInfo(this ExecutionMessage message)
+		{
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
+
+			return message.ExecutionType == ExecutionTypes.Transaction && message.HasOrderInfo;
+		}
+
+		/// <summary>
+		/// Determines whether the specified message contains trade information.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <returns><see langword="true"/> if the specified message contains trade information, otherwise, <see langword="false"/>.</returns>
+		public static bool HasTradeInfo(this ExecutionMessage message)
+		{
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
+
+			return message.ExecutionType == ExecutionTypes.Transaction && message.HasTradeInfo;
+		}
+
+		/// <summary>
+		/// Convert error test message to <see cref="ErrorMessage"/> instance.
+		/// </summary>
+		/// <param name="description">Error test message.</param>
+		/// <returns><see cref="ErrorMessage"/> instance.</returns>
+		public static ErrorMessage ToErrorMessage(this string description)
+		{
+			return  new InvalidOperationException(description).ToErrorMessage();
+		}
+
+		/// <summary>
+		/// Convert error info into <see cref="ErrorMessage"/>.
+		/// </summary>
+		/// <param name="error">Error info.</param>
+		/// <returns>Error message.</returns>
+		public static ErrorMessage ToErrorMessage(this Exception error)
+		{
+			if (error == null)
+				throw new ArgumentNullException(nameof(error));
+
+			return new ErrorMessage { Error = error };
 		}
 	}
 }

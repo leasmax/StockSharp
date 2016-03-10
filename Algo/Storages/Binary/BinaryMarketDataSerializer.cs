@@ -52,6 +52,7 @@ namespace StockSharp.Algo.Storages.Binary
 		public static readonly Version Version55 = new Version(5, 5);
 		public static readonly Version Version56 = new Version(5, 6);
 		public static readonly Version Version57 = new Version(5, 7);
+		public static readonly Version Version58 = new Version(5, 8);
 	}
 
 	abstract class BinaryMetaInfo<TMetaInfo> : MetaInfo
@@ -360,7 +361,7 @@ namespace StockSharp.Algo.Storages.Binary
 			Serialize(stream, data.Cast<TData>(), metaInfo);
 		}
 
-		IEnumerableEx IMarketDataSerializer.Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
+		IEnumerable IMarketDataSerializer.Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
 		{
 			return Deserialize(stream, metaInfo);
 		}
@@ -375,14 +376,13 @@ namespace StockSharp.Algo.Storages.Binary
 			//return stream.To<byte[]>();
 		}
 
-		public IEnumerableEx<TData> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
+		public IEnumerable<TData> Deserialize(Stream stream, IMarketDataMetaInfo metaInfo)
 		{
 			var data = new MemoryStream();
 			stream.CopyTo(data);
 			stream.Dispose();
 
-			return new SimpleEnumerable<TData>(() => new MarketDataEnumerator(this, new BitArrayReader(data), (TMetaInfo)metaInfo))
-				.ToEx(metaInfo.Count);
+			return new SimpleEnumerable<TData>(() => new MarketDataEnumerator(this, new BitArrayReader(data), (TMetaInfo)metaInfo));
 		}
 
 		protected abstract void OnSave(BitArrayWriter writer, IEnumerable<TData> data, TMetaInfo metaInfo);

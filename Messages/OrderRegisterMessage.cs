@@ -31,15 +31,6 @@ namespace StockSharp.Messages
 	public class OrderRegisterMessage : OrderMessage
 	{
 		/// <summary>
-		/// Transaction ID.
-		/// </summary>
-		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.TransactionKey)]
-		[DescriptionLoc(LocalizedStrings.TransactionIdKey, true)]
-		[MainCategory]
-		public long TransactionId { get; set; }
-
-		/// <summary>
 		/// Order price.
 		/// </summary>
 		[DataMember]
@@ -96,14 +87,6 @@ namespace StockSharp.Messages
 		[DescriptionLoc(LocalizedStrings.Str142Key)]
 		[MainCategory]
 		public DateTimeOffset? TillDate { get; set; }
-
-		/// <summary>
-		/// Order condition (e.g., stop- and algo- orders parameters).
-		/// </summary>
-		[DisplayNameLoc(LocalizedStrings.Str154Key)]
-		[DescriptionLoc(LocalizedStrings.Str155Key)]
-		[CategoryLoc(LocalizedStrings.Str156Key)]
-		public OrderCondition Condition { get; set; }
 
 		/// <summary>
 		/// Limit order time in force.
@@ -187,7 +170,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + ",TransId={0},Price={1},Side={2},OrdType={3},Vol={4},Sec={5}".Put(TransactionId, Price, Side, OrderType, Volume, SecurityId);
+			return base.ToString() + $",TransId={TransactionId},Price={Price},Side={Side},OrdType={OrderType},Vol={Volume},Sec={SecurityId}";
 		}
 	}
 }

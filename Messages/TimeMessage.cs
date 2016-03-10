@@ -18,8 +18,6 @@ namespace StockSharp.Messages
 	using System;
 	using System.Runtime.Serialization;
 
-	using Ecng.Common;
-
 	/// <summary>
 	/// The message contains information about the current time.
 	/// </summary>
@@ -39,7 +37,7 @@ namespace StockSharp.Messages
 		/// Request identifier.
 		/// </summary>
 		[DataMember]
-		public string TransactionId { get; set; }
+		public long TransactionId { get; set; }
 
 		/// <summary>
 		/// ID of the original message <see cref="TimeMessage.TransactionId"/> for which this message is a response.
@@ -59,7 +57,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + ",ID={0},Response={1}".Put(TransactionId, OriginalTransactionId);
+			return base.ToString() + $",ID={TransactionId},Response={OriginalTransactionId}";
 		}
 
 		/// <summary>

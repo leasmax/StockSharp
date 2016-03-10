@@ -89,7 +89,7 @@ namespace StockSharp.Quik
 		public event Action<Type, IEnumerable<object>> NewCustomTables;
 		public event Action<Type, IEnumerable<object>> CustomTablesChanged;
 
-		public DdeCustomTableList CustomTables { get; private set; }
+		public DdeCustomTableList CustomTables { get; }
 
 		public bool TryDeserialize(string category, IList<IList<object>> rows)
 		{
@@ -134,11 +134,11 @@ namespace StockSharp.Quik
 						newEntities.ForEach(e => table.Cache.SafeAdd(schema.Identity.Accessor.GetValue(e), key => e));
 					}
 
-					NewCustomTables.SafeInvoke(schema.EntityType, newEntities);
+					NewCustomTables?.Invoke(schema.EntityType, newEntities);
 				}
 
 				if (changedEntities.Count > 0)
-					CustomTablesChanged.SafeInvoke(schema.EntityType, changedEntities);
+					CustomTablesChanged?.Invoke(schema.EntityType, changedEntities);
 
 				return true;
 			}

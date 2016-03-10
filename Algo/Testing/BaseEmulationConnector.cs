@@ -18,7 +18,6 @@ namespace StockSharp.Algo.Testing
 	using System;
 
 	using StockSharp.BusinessEntities;
-	using StockSharp.Messages;
 
 	/// <summary>
 	/// The base connection of emulation.
@@ -31,26 +30,18 @@ namespace StockSharp.Algo.Testing
 		protected BaseEmulationConnector()
 		{
 			EmulationAdapter = new EmulationMessageAdapter(TransactionIdGenerator);
+			TimeChange = false;
 		}
 
 		/// <summary>
 		/// The adapter, executing messages in <see cref="IMarketEmulator"/>.
 		/// </summary>
-		public EmulationMessageAdapter EmulationAdapter
-		{
-			get; }
+		public EmulationMessageAdapter EmulationAdapter { get; }
 
 		/// <summary>
 		/// Gets a value indicating whether the re-registration orders via the method <see cref="IConnector.ReRegisterOrder(StockSharp.BusinessEntities.Order,StockSharp.BusinessEntities.Order)"/> as a single transaction.
 		/// </summary>
 		public override bool IsSupportAtomicReRegister => EmulationAdapter.Emulator.Settings.IsSupportAtomicReRegister;
-
-		/// <summary>
-		/// To start the messages generating timer <see cref="TimeMessage"/> with the <see cref="Connector.MarketTimeChangedInterval"/> interval.
-		/// </summary>
-		protected override void StartMarketTimer()
-		{
-		}
 
 		private void SendInGeneratorMessage(MarketDataGenerator generator, bool isSubscribe)
 		{

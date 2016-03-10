@@ -1,3 +1,15 @@
+ErrTimeframePriceStepNotSet;Timeframe and price step were not set;Таймфрейм и шаг цены не были установлены
+BoxChart;Box chart;Боксовый график
+ClusterProfile;Cluster profile;Кластерный профиль
+VolumeSettings;Volume display settings;Свойства отображения объемов
+ClusterLineColor;Cluster base line color;Цвет базовой линии кластера
+ClusterTextColor;Cluster text color;Цвет текста кластера
+ClusterMaxVolumeColor;Cluster max volume color;Цвет максимального объема в кластере
+LocalHorizontalVolumes;Local horizontal volumes;Локальный горизонтальный объем
+ShowHorizontalVolumes;Show horizontal volumes;Показывать горизонтальный объем
+HorizontalVolumeWidthFraction;Horizontal volume size fraction;Ширина горизонтального объема (доля [0;1])
+HorizontalVolumeColor;Horizontal volume color;Цвет горизонтального объема
+HorizontalVolumeFontColor;Horizontal volume font color;Цвет шрифта горизонтального объема
 BoxChartSettings;Box chart settings;Настройки боксового графика
 ClusterProfileSettings;Cluster profile chart settings;Настройки графика кластерного профиля
 PriceStepForChartElement;Price step for this chart element;Шаг цены для данного элемена графика
@@ -88,6 +100,8 @@ Str84;Minimum price of a candle.;Минимальная цена свечи.
 ClosingPrice;Closing price;Цена закрытия
 Str86;Candle closing price.;Цена закрытия свечи.
 Volume;Volume;Объем
+VolumeOrder;Volume (order);Объем (заявка)
+VolumeTrade;Volume (trade);Объем (сделка)
 TotalCandleVolume;Total candle volume.;Суммарный объем свечи.
 OI;OI;ОИ
 OpenInterest;Open interest.;Открытый интерес.
@@ -395,7 +409,7 @@ Str402;Completed;Завершена
 Str403;Buy;Покупка
 Str404;Sell;Продажа
 Str405;Put in queue;Поставить в очередь
-FOC;Fill Or Kill;Немедленно или отклонить
+FOK;Fill Or Kill;Немедленно или отклонить
 IOC;Immediate Or Cancel;Снять остаток
 Str408;Work mode (time, holidays etc.).;Режим работы (время, выходные дни и т.д.).
 Str409;Periods;Периоды
@@ -446,7 +460,7 @@ Str494;Quote to buy.;Котировка на покупку.
 Str495;Quote to sell.;Котировка на продажу.
 Str496;Price spread;Спред по цене
 Str497;Size of price spread.;Размер спреда по цене.
-Str498;Volume spread.;Спреда по объему.
+Str498;Volume spread;Спреда по объему
 Str499;Size of volume spread. If value is negative, then best ask has a larger volume than best bid.;Размер спреда по объему. Если значение отрицательное, значит лучший оффер имеет больший объем, чем лучший бид.
 Str500;Spread;Спред
 Str501;Spread middle.;Середина спреда.
@@ -903,10 +917,9 @@ Str973;Max short position;Max короткая позиция
 Str974;Maximum short position size.;Максимальный размер короткой позиции.
 Str975;Opposite;Встречная
 Str976;Following;Попутная
-Str977;Connection settings;Настройки подключения
+ConnectionSettings;Connection settings;Настройки подключения
 Str978;Mechanism for tracking connections with the trading system settings.;Настройки механизма отслеживания подключения с торговом системой.
 Settings;Settings;Настройки
-ConnectionSettings;Connection settings.;Настройки для подключения.
 Export;Export;Экспорт
 ExportSettings;Export settings.;Настройки для экспорта.
 Str983;Profitable trades;Прибыльных сделок
@@ -1091,8 +1104,8 @@ Str1170Params;Board {0} does not allow registration of market orders.;Площа
 Str1171;This session is currently inactive.;Сейчас эта сессия не идет.
 Str1172Params;Price {0} of order {1} is lower than allowed minimum {2}.;Цена {0} заявки {1} меньше минимально допустимой {2}.
 Str1173Params;Price {0} of order {1} is greater than allowed maximum {2}.;Цена {0} заявки {1} больше максимально допустимой {2}.
-Str1174;Emulation;Эмуляция
-Str1175;Emulation (extra);Эмуляция (дополнительно)
+Str1174;Backtesting;Эмуляция
+Str1175;Backtesting (extra);Эмуляция (дополнительно)
 Str1176;Combine on touch;Сводить при касании
 Str1177;When emulating trades combination, combine orders, when trade price touched the order price (equal to order price).;При эмулировании сведения по сделкам, производить сведение заявок, когда цена сделки коснулась цены заявки (равна цене заявки).
 Str1178;Market depth (lifetime);Стакан (время жизни)
@@ -1447,13 +1460,9 @@ Str1542Params;For portfolio {0} adapter is already specified.;Для портф�
 Str1543;Money;Деньги
 Str1544;Selected: ;Выбрано: 
 Str1545Params;Editing {0};Редактирование {0}
-Str1546;Minimum price step is not specified.;Минимальный шаг цены не указан.
-Str1547;Trading board is not specified.;Торговая площадка не указана.
 Str1548Params;Security {0} is missing in the collection.;Инструмент {0} отсутствует в коллекции.
 Str1549Params;{0} is an invalid identifier. Symbols '{1}' are not allowed.;'{0}' является недопустимым идентификатором. Символы '{1}' являются недопустимыми.
 Str1550;Symbol @ is met several times.;Символ @ встречается несколько раз.
-Str1551;Security code is not specified.;Код инструмента не указан.
-Str1552;Exchange board not specified.;Биржевая площадка не указана.
 Str1553Params;Description of connection {0} not found.;Описание для подключения {0} не найдено.
 Str1554;Working connection can not be deleted.;Нельзя удалить подключенное соединение.
 Str1555;Working connection can not be edited.;Нельзя редактировать подключенное соединение.
@@ -1557,8 +1566,10 @@ Str1657Params;For message with transaction ID {0} the original transaction ID wa
 Str1658;None;Отсутствует
 Str1659;Quotes;Котировки
 Str1660;Depth;Глубина
-Str1662;Version;Версия
-Str1663;Version FIX protocol.;Версия FIX протокола.
+Version;Version;Версия
+Dialect;Dialect;Диалект
+FixVersionProtocol;Version FIX protocol.;Версия FIX протокола.
+FixDialectProtocol;Dialect FIX protocol.;Диалект FIX протокола.
 FixFormat;FIX protocol format.;Формат FIX протокола.
 Str1664;Sender;Отправитель
 Str1665;Sender ID.;Идентификатор отправителя.
@@ -1664,8 +1675,8 @@ Str1771;General (Quik);Общие (Quik)
 Str1772;Use for old DDE + Trans2Quik connection.;Использовать для старое подключение DDE + Trans2Quik.
 Str1773;Path to Quik;Путь к Quik
 Str1774;Path to directory, where Quik is installed (or path to info.exe file).;Путь к директории, где установлен Quik (или путь к файлу info.exe).
-Str1775;Load orders placed by hand;Загружать ручные заявки
-Str1776;Load orders sent to Quik by hand.;Загружать заявки, поданные вручную через Quik.
+Str1775;Load orders placed manually;Загружать ручные заявки
+Str1776;Load orders sent to Quik manually.;Загружать заявки, поданные вручную через Quik.
 Str1777;Dll file;Имя dll-файла
 Str1778;Dll file, containing Quik API.;Имя dll-файла, содержащее Quik API.
 Str1779;DDE server;DDE сервер
@@ -2741,7 +2752,7 @@ Str2949;Continue?;Продолжить?
 Str2950;Autostart of quotes downloading was successful.;Автостарт скачивания котировок произведен успешно.
 Str2951;No task was launched. Detailed information is available in the log.;Ни одна из задач не была запущена. Детальная информация доступна в логе.
 Str2952Params;You must restart {0} to apply these changes. Restart now?;Для работы в выбранном режиме необходимо перезапустить {0}. Перезапустить сейчас?
-Str2954;S#.Data settings will be reset. This operation is irreversible. Are you sure you want to continue?;Настройки S#.Data будут сброшены. Данная операция не обратима. Вы уверены, что хотите продолжить?
+Str2954Params;{0} settings will be reset. This operation is irreversible. Are you sure you want to continue?;Настройки {0} будут сброшены. Данная операция не обратима. Вы уверены, что хотите продолжить?
 Str2955;Data processing error;Ошибка обработки данных
 Str2956Params;Error subscribing to {0} for {1};Ошибка подписки на {0} для {1}
 Str2958;Connection restored.;Подключение восстановлено.
@@ -2946,7 +2957,7 @@ Str3172;Days of history data;Дней истории
 Str3173;Number of history days for strategy initialization.;Количество дней истории для инициализации стратегии.
 Str3174;Strategy not compiled.;Стратегия не скомпилирована.
 Str3175Params;Error initializing strategy diagram: {0};Ошибка инициализации схемы стратегии: {0}
-Str3176;Live;Реал
+Str3176;Live;Торговля
 Str3177;Optimization;Оптимизация
 Str3178;Stopped;Остановлена
 Str3179;Running;Выполняется
@@ -3038,7 +3049,6 @@ Str3271;Panel for viewing own trades data.;Панель для просмотр�
 Str3272;Market depth with quotes, showing the depth of market.;Стакан с котировками, показывающий глубину рынка.
 Str3273;Incorrect limit order price.;Неверно указана цена для лимитной заявки.
 Str3274;Securities.;Торговые инструменты.
-Str3275Params;Security with ID {0} already exists.;Инструмент с идентификатором {0} уже существует.
 Str3276;New securities in storage;Новые инструменты в хранилище
 Str3277;Open market depth;Открыть стакан
 Str3278;Trades feed;Лента сделок
@@ -3404,7 +3414,7 @@ Str3672;Completed building updates.;Построение обновлений з
 Str3673;Path to a directory where publication data is stored is not specified.;Не указан путь к директории где хранятся данные для публикации.
 Str3674;WyBuild project file name is not specified.;Не указано имя файла проекта wyBuild.
 Str3675;Path to the assembly of a published project is not specified.;Не указан путь к сборке публикуемого проекта.
-Str3676;Project has changed. Save changes?;Проект был изменен. Сохранить изменения?
+Str3676Params;Scheme {0} has changed. Save changes?;Схема {0} была изменена. Сохранить изменения?
 Str3677;Executable file is not specified.;Не указан файл для запуска.
 Str3678Params;New order for '{0}';Новая заявка на '{0}'
 Str3679;Login for Transaq server.;Логин к серверу Transaq.
@@ -3732,11 +3742,10 @@ XamlStr317;Name (short);Название (короткое)
 XamlStr320;Highest bid;Наивысшый бид
 XamlStr323;Lowest ask;Наименьший оффер
 XamlStr324;Find security;Найти инструмент
-XamlStr325;Fin securities:;Найти инструменты:
+XamlStr325;Find securities:;Найти инструменты:
 CommissionSettings;Commission settings;Настройка комиссий
 RiskSettings;Risk settings;Настройка контроля рисков
 XamlStr332;Mapping configuration for portfolios and connections;Настройка сопоставления портфелей и подключений
-XamlStr334;Connection settings;Настройки подключений
 NetworkSettings;Network settings;Настройки сети
 NotificationSettings;Notification settings;Настройки уведомлений
 StartTime;Start time;Начало работы
@@ -3768,6 +3777,7 @@ Window;Window;Окно
 XamlStr387;End time;Окончание работы
 OrderLogOf;OL;ОЛ
 OnlineDoc;Online documentation;Онлайн документация
+IsSupportAtomicReRegister;Atomic reregister;Атомарная перерегистрация
 XamlStr391;Description of the source and its data;Описание источника и получаемых данных
 XamlStr392;Task description:;Описание источника:
 XamlStr394;Optimize;Оптимизировать
@@ -4052,7 +4062,7 @@ XamlStr810;Exact expiration filter for options;Фильтр по точной э
 Filter;Filter;Фильтр
 Forex;Forex;Форекс
 XamlStr814;Text value format. Used only for dates and times.;Формат текстового значения. Используется только для дат и времени.
-StorageFormat;Storage format:;Формат хранилища:
+StorageFormat;Storage format;Формат хранилища
 Features;Features;Функциональность
 MarketDataStorage;Market data storage;Хранилище данных
 LineColor;Line color;Цвет линии
@@ -4125,7 +4135,7 @@ AllDepths;All depths;Все стаканы
 RequestAllDepths;Request depths for all securities.;Запрашиваемое стаканы по всем инструментам.
 ExportSchema;Export schema to container;Экспортировать схему в контейнер
 IsControlConnectionLost;Control connection lost.;Контролировать потерю соединения с роутером.
-Override;Override.;Перезаписать.
+Override;Override;Перезаписать
 OverrideDll;Override dll file from resources. Turned on by default.;Перезаписать файл библиотеки из ресурсов. По-умолчанию файл будет перезаписан.
 WrongTimeOffset;Time {0} has wrong offset. Expected {1}.;Время {0} имеет неправильное смещение. Ожидается {1}.
 TimeOffset;Time offset;Смещение времени
@@ -4189,6 +4199,24 @@ CandleTimeInterval;Interval (in days), for which the downloaded candles.;Инт�
 StrategyNotSelected;Strategy is not selected;Стратегия не выбрана
 Palette;Palette;Палитра
 RefreshScheme;Refresh scheme;Обновить схему
+LabelsFormatIntraday;Labels format (intraday);Формат надписей (внутри дня)
+LabelsFormatIntradayDesc;The format of X-axis labels within the day;Формат надписей для оси X внутри дня
+BestPair;Best pair quotes;Лучшая пара котировок
+ReadTimeOut;Timeout (get);Время ожидания (получение)
+WriteTimeOut;Timeout (send);Время ожидания (отправка)
+ReadTimeOutDesc;The timeout of getting data from the server.;Время ожидания получения данных от сервера.
+WriteTimeOutDesc;The timeout of sending data to the server.;Время ожидания отправки данных на сервер.
+Themes;Themes;Темы
+Equal;Equal;Равно
+NotEqual;Not equal;Не равно
+Greater;Greater;Больше
+GreaterOrEqual;Greater or equal;Больше или равно
+Less;Less;Меньше
+LessOrEqual;Less or equal;Меньше или равно
+Any;Any;Любое
+LoadingVariableErrorParams;Loading variable parameter error: {0}.;Ошибка загрузки параметра переменной {0}.
+CancelOnDisconnect;Cancel On Disconnect;Cancel On Disconnect
+CancelOnDisconnectDesc;Heartbeat interval. Uses in Cancel On Disconnect mode.;Интервал оповещения сервера об активности. Используется в режиме Cancel On Disconnect.
 DocStr0;Button activation alert settings;Кнопка активации настроек сигнала
 DocStr1;Initializes a new instance of the {0};Создать {0}
 DocStr2;Load settings;Загрузить настройки
